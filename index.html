@@ -45,8 +45,8 @@
 		<div id="games" data-role="page">
 			<div id="games" class="games" data-role="page">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
-					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-home ui-btn-icon-notext' data-role='button' role='button' style='display:none'></a>
-					<a href='#gameseditor' class='btn-edit-game ui-btn-right ui-btn ui-icon-edit ui-btn-icon-notext' data-role='button' role='button' style='padding:0px; display:none'></a>
+					<a data-href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-home ui-btn-icon-notext' data-role='button' role='button' style='display:none'></a>
+					<a data-href='#gameseditor' class='btn-edit-game ui-btn-right ui-btn ui-icon-edit ui-btn-icon-notext' data-role='button' role='button' style='padding:0px; display:none'></a>
 					<h4 style='margin:0px;font-size:22px; text-align:center'> ScoreKeeper </h4>
 				</div>
 				<div class="games"></div>
@@ -60,8 +60,8 @@
 		<div id='session' data-role='page'>
 			<div id="players" class="players" data-role="page">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
-					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button' style='padding:10px'></a>
-					<a href='' class='btn-add-game ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:none'></a>
+					<a data-href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button' style='padding:10px'></a>
+					<a data-href='' class='btn-add-game ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:none'></a>
 					<h4 class='title' style='margin-left:60px;margin-right:0px;font-size:20px; text-align:left'></h4>
 				</div>
 				<div class="players"></div>
@@ -75,8 +75,8 @@
 		<div id="sessions" data-role="page">
 			<div id="sessions" class="sessions" data-role="page">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
-					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-home ui-btn-icon-notext' data-role='button' style='padding:10px' role='button' style='display:block'></a>
-					<a href='#sessionseditor?' id='session-editor' class='btn-edit-game ui-btn-right ui-btn ui-icon-edit ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:none'></a>
+					<a data-href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-home ui-btn-icon-notext' data-role='button' style='padding:10px' role='button' style='display:block'></a>
+					<a data-href='#sessionseditor?' id='session-editor' class='btn-edit-game ui-btn-right ui-btn ui-icon-edit ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:none'></a>
 					<h4 class='title' style='margin-left:60px;margin-right:0px;font-size:22px; text-align:center'></h4>
 				</div>
 				<div class="sessions"></div>
@@ -113,8 +113,8 @@
 
 				<!--<script type='text/template' id='playersTemplate'>
 					<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
-						<a href='' class='btn-back-sessions ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button'></a>
-						<a href='' class='btn-add-player ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button'></a>
+						<a data-href='' class='btn-back-sessions ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button'></a>
+						<a data-href='' class='btn-add-player ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button'></a>
 						<text style='font-size:22px'> ScoreKeeper </text>
 					</div>
 				</script>-->
@@ -123,10 +123,10 @@
 					<ul class="ui-listview" data-role="listview" data-type="horizontal">
 						<li class="ui-first-child ui-last-child">
 							<div class="behind">
-								<a href="#" class="ui-btn delete-btn">Delete</a>
-								<a href="#" class="ui-btn edit-btn pull-left">Edit</a>
+								<a data-href="#" class="ui-btn delete-btn">Delete</a>
+								<a data-href="#" class="ui-btn edit-btn pull-left">Edit</a>
 							</div>
-							<a href='#sessions?<%=id%>' data-role='button' data-transition='slide' class='btn-game-name ui-btn ui-icon-carat-r ui-btn-icon-right' style=''><%=name%></a>
+							<a data-href='#sessions?<%=id%>' data-role='button' data-transition='slide' class='btn-game-name ui-btn ui-icon-carat-r ui-btn-icon-right' style=''><%=name%></a>
 						</li>
 					</ul>
 				</script>
@@ -135,10 +135,10 @@
 					<ul class="ui-listview" data-role="listview" data-type="horizontal">
 						<li class="ui-first-child ui-last-child">
 							<div class="behind">
-								<a href="#" class="ui-btn delete-btn">Delete</a>
+								<a data-href="#" class="ui-btn delete-btn">Delete</a>
 								
 							</div>
-							<a href='#session?<%=gameID%>?<%=id%>' data-role='button' data-transition='slide' class='btn-game-name ui-btn ui-icon-carat-r ui-btn-icon-right' style=''><%=timestamp%></a>
+							<a data-href='#session?<%=gameID%>?<%=id%>' data-role='button' data-transition='slide' class='btn-game-name ui-btn ui-icon-carat-r ui-btn-icon-right' style=''><%=timestamp%></a>
 						</li>
 
 					</ul>
