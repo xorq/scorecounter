@@ -211,7 +211,6 @@ var GamesView = Backbone.View.extend({
 			$('.ui-listview li > a.open').css('left', '0px').removeClass('open') // close em all
 			$(e.currentTarget).addClass('open')
 			x = e.originalEvent.targetTouches[0].pageX // anchor point
-			e.currentTarget.style.left = 0;
 		})
 		.on('touchmove', function(e) {
 			var change = e.originalEvent.targetTouches[0].pageX - x
@@ -230,11 +229,7 @@ var GamesView = Backbone.View.extend({
 				new_left = '0px'
 			}
 			// e.currentTarget.style.left = new_left
-			$(e.currentTarget).animate({left: new_left}, 200);
-
-			if (left != 0) {
-				e.stopPropagation();
-			}
+			$(e.currentTarget).animate({left: new_left}, 200)
 			
 		});
 	},
@@ -329,7 +324,6 @@ var SessionsView = Backbone.View.extend({
 			$('.ui-listview li > a.open').css('left', '0px').removeClass('open') // close em all
 			$(e.currentTarget).addClass('open')
 			x = e.originalEvent.targetTouches[0].pageX // anchor point
-			e.currentTarget.style.left = 0;
 		})
 		.on('touchmove', function(e) {
 			var change = 0.5 * (e.originalEvent.targetTouches[0].pageX - x)
@@ -349,11 +343,6 @@ var SessionsView = Backbone.View.extend({
 			}
 			// e.currentTarget.style.left = new_left
 			$(e.currentTarget).animate({left: new_left}, 200)
-
-			if (left != 0) {
-				e.stopPropagation();
-			}
-
 		});
 
 	},
@@ -662,15 +651,7 @@ appScore.app = {
 	// Application Constructor
 	initialize: function() {
 		this.bindEvents();
-
-		$(document).on('touchend', 'a', function(e) { 
-			console.log('clicked');
-			console.log($(this).attr('data-href')); 
-			document.location.href = $(this).attr('data-href');
-			//return false;
-		});
-
-		console.log('initialized');
+		console.log('initialized')
 	},
 	// Bind Event Listeners
 	//
@@ -690,6 +671,7 @@ appScore.app = {
 
 	games: function(event, args) {
 		this.undelegateAll();
+		this.bindEvents();
 
 		this.gamesCollection.load();
 		var view = new GamesView({ collection: this.gamesCollection })
@@ -701,6 +683,7 @@ appScore.app = {
 	sessions: function(event, args) {
 		this.undelegateAll();
 
+		this.bindEvents();
 		this.gamesCollection.load();
 		var view = new SessionsView({ collection: (this.gamesCollection.get(args[1])).get('sessions') });
 		this.activeViews.push( view );
@@ -715,6 +698,7 @@ appScore.app = {
 	session: function(event, args) {
 		this.undelegateAll();
 
+		this.bindEvents();
 		this.gamesCollection.load();
 		var view = new PlayersView({ model: (this.gamesCollection.get(args[1])).get('sessions').get(args[2]) });
 		this.activeViews.push( view );
@@ -770,7 +754,6 @@ appScore.router = new $.mobile.Router(
 	},
 	appScore.app
 );
-appScore.app.initialize();
 
 /*
 ​app = new Workspace();
