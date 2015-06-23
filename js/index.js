@@ -612,12 +612,14 @@ var PlayerView = Backbone.View.extend({
 		return this;
 	},
 	incrementScore: function(increment) {
+
 		var newScore = (this.model.get('score') ? this.model.get('score') : 0) + increment;
 		this.model.score = this.model.set('score', newScore);
 		($('.score', this.$el)).text(newScore);
 		this.trigger('change');
 	},
 	plus: function() {
+		console.log(play_single_sound());
 		this.incrementScore( 1 );
 	},
 	minus: function() {
