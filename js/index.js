@@ -538,62 +538,9 @@ var PlayersView = Backbone.View.extend({
 			master.listenTo(playerView, 'delete', master.removedPlayer);
 		})
 		this.trigger('change');
-	},
-
-	startSession: function() {
-		if(this.model.get('finishTime')) {
-			return
-		};
-		master = this;
-		$('.timer').html('0s');
-		this.model.set('startTime', Number(new Date))
-		console.log(this.model.get('startTime'));
-		this.trigger('change')
 		this.render();
 	},
 
-	stopSession: function() {
-		if(this.model.get('finishTime')) {
-			return
-		};		
-		if(!this.model.get('startTime')) {
-			return
-		};
-
-		this.model.set('finishTime', Number(new Date));
-		this.trigger('change');
-		this.render();
-		$('.btn-reset-timer', this.$el).css('display', 'block');
-	},
-
-	pauseTimer: function() {
-		console.log(this.model.get('paused'))
-		//this.model.startPause();
-		//this.model.set('paused', Number(new Date()))
-		//this.trigger('change')
-		//console.log(this.model.get('paused'))
-		if (!this.model.get('paused')) {
-			$('.btn-pause-timer', this.$el).html('- Continue -');
-			this.model.startPause();
-			console.log(this.model.get('paused'))
-			clearInterval(this.timer);
-		} else {
-
-			/*this.model.finishPause();
-			$('.btn-pause-timer', this.$el).html('- Pause Timer -');
-			this.render()*/
-		}
-	},
-
-	resetTimer: function() {
-		var sure = window.confirm('sure ?');
-		if (!sure){
-			return
-		}
-		this.model.set('finishTime', 0);
-		this.model.set('startTime', 0);
-		this.render();
-	}
 });
 
 var PlayerView = Backbone.View.extend({
@@ -619,7 +566,7 @@ var PlayerView = Backbone.View.extend({
 		this.trigger('change');
 	},
 	plus: function() {
-		console.log(play_single_sound());
+		play_single_sound();
 		this.incrementScore( 1 );
 	},
 	minus: function() {
