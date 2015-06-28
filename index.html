@@ -173,12 +173,15 @@
 		<script type='text/javascript' src='bower_components/bootstrap/dist/js/bootstrap.min.js'></script>
 		<script type='text/javascript' src='bower_components/underscore/underscore-min.js'></script>
 		<script type='text/javascript' src='bower_components/backbone/backbone.js'></script>
-		<script type='text/javascript' src='bower_components/backbone.touch/backbone.touch.js'></script>
-		<script type='text/javascript' src='models/biginteger.js'></script>
-		<script type='text/javascript' src='models/bitcoinjs.min.js'></script>
-		<script type='text/javascript' src='models/pbkdf2.js'></script>
-		<script type='text/javascript' src='models/scrypt.js'></script>
-
+		<script type='text/javascript' src='bower_components/backbone.touch/backbone.touch.js'></script>*
 		<script type="text/javascript" src="js/index.js"></script>
+		<audio id="audiotag1" src="happy.m4a" preload="auto"></audio>
+		<a href="javascript:play_single_sound();">Play 5-sec sound on single channel</a>
+		<script type="text/javascript">
+			function play_single_sound() {
+				document.getElementById('audiotag1').play();
+			}
+		</script>
+
 	</body>
 </html>
