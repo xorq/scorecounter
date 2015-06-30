@@ -406,7 +406,7 @@ var TimerView = Backbone.View.extend({
 		'click .btn-finish-session' : 'finishSession',
 	},
 	render: function() {
-		master = this;
+		var master = this;
 		this.$el.html(this.template(this.model.toJSON()));
 		console.log(this.model.get('pauseTime'))
 		$('.clock').html(getDuration(this.model.get('startTime') && (0.001 * ((this.model.get('finishTime') || Number(new Date)) - (this.model.get('startTime') + this.model.get('pauseTime') + (this.model.get('paused') ? (Number(new Date) - this.model.get('paused') ) : 0))))))
@@ -471,7 +471,7 @@ var PlayersView = Backbone.View.extend({
 		this.trigger('change');
 	},
 	removedPlayer: function() {
-		master = this;
+		var master = this;
 		var playersHolder = $('.players', this.$el);
 		playersHolder.empty();
 
@@ -484,7 +484,7 @@ var PlayersView = Backbone.View.extend({
 		this.trigger('change');
 	},
 	render: function() {
-		master = this;
+		var master = this;
 
 		//clearInterval(this.timer);
 		timerHolder = $('.timer', this.$el)
@@ -513,6 +513,7 @@ var PlayersView = Backbone.View.extend({
 	},
 
 	addPlayer: function() {	
+		var master = this;
 		var playersHolder = $('.players', this.$el);
 		playersHolder.empty();
 
