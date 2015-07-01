@@ -448,6 +448,10 @@ var TimerView = Backbone.View.extend({
 		this.render();
 	},
 	finishSession: function() {
+		var finished = window.confirm('Finish Session ?');
+		if (!finished){
+			return
+		}
 		this.model.set('finishTime', Number(new Date));
 		if (this.model.get('paused')) {
 			this.model.set('pauseTime', this.model.get('pauseTime') + Number(new Date) - this.model.get('paused'));
@@ -615,6 +619,7 @@ appScore.app = {
 		this.activeViews.push( view );
 		view.render();
 		$('.ui-header h4').html('ScoreKeeper')
+
 	},
 
 	sessions: function(event, args) {

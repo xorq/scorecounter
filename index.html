@@ -38,12 +38,11 @@
 
 
 	<body>
-
 		<div class='background'></div>
 	
 
-		<div id="games" data-role="page">
-			<div id="games" class="games" data-role="page">
+		<div id="games" data-role="page" data-theme="b">
+			<div id="games" class="games" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
 					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-home ui-btn-icon-notext' data-role='button' role='button' style='display:none'></a>
 					<a href='#gameseditor' class='btn-edit-game ui-btn-right ui-btn ui-icon-edit ui-btn-icon-notext' data-role='button' role='button' style='padding:0px; display:none'></a>
@@ -57,10 +56,10 @@
 		</div>
 
 
-		<div id='session' data-role='page'>
-			<div id="players" class="players" data-role="page">
+		<div id='session' data-role='page' class="ui-page-theme-b">
+			<div id="players" class="players" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
-					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button' style='padding:10px'></a>
+					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button' style='top:0px;padding:10px'></a>
 					<a href='' class='btn-add-game ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:none'></a>
 					<h4 class='title' style='margin-left:60px;margin-right:0px;font-size:20px; text-align:left'></h4>
 				</div>
@@ -72,8 +71,8 @@
 		</div>
 
 
-		<div id="sessions" data-role="page">
-			<div id="sessions" class="sessions" data-role="page">
+		<div id="sessions" data-role="page" data-theme="b">
+			<div id="sessions" class="sessions" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
 					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-home ui-btn-icon-notext' data-role='button' style='padding:10px' role='button' style='display:block'></a>
 					<a href='#sessionseditor?' id='session-editor' class='btn-edit-game ui-btn-right ui-btn ui-icon-edit ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:none'></a>
@@ -92,8 +91,8 @@
 
 		
 
-		<div data-role="page" id="title" data-title="Score Keeper">
-			<div class="app" style="width:100%" data-role="page" id="scripts">
+		<div data-role="page" data-theme="b" id="title" data-title="Score Keeper">
+			<div class="app" style="width:100%" data-role="page" data-theme="b" id="scripts">
 
 
 
@@ -103,7 +102,7 @@
 				</script> 
 
 				<script type='text/template' id='timerTemplate'>
-					<a data-role='' class='clock' style='color:black;display:block'></a>
+					<a data-role='' class='clock' style='display:block'></a>
 					<a data-role='button' class='btn-start-session ui-btn' style='color:green;display:<%=startTime && "none"%>'>- Start Session -</a>
 					<a data-role='button' class='btn-finish-session ui-btn' style='color:green;display:<%=(!finishTime && startTime) ? "block" : "none"%>'>- Finish Session -</a>
 					<a data-role='button' class='btn-pause-timer ui-btn' style='color:green;display:<%=(!finishTime && startTime && !paused) ? "block" : "none"%>'>- Pause Timer -</a>
@@ -146,7 +145,7 @@
 				<script type='text/template' id='playerTemplate'>
 					<div class="ui-grid-a" style='height:50px'>
 						<div class='ui-block-b' style='width:33%;height: 100%;'>
-							<input type="text" class='player-name' value='<%=name%>'></input>
+							<input type="text" class='player-name' style="color:white;background:black" value='<%=name%>'></input>
 						</div>
 						<div class="ui-block-c" style='font-size:100%;text-align:center;height: 100%;width:18%'>
 							<text class='score' style=''><%=score%></text>
