@@ -271,8 +271,9 @@ var GameView = Backbone.View.extend({
 		}
 	},
 	editName: function() {
+		var oldName = this.model.get('name');
 		var newName = window.prompt('what name ?')
-		this.model.set('name', newName);
+		this.model.set('name', newName ? newName : oldName);
 		//this.render();
 		this.trigger('change')
 	},
@@ -556,9 +557,9 @@ var PlayerView = Backbone.View.extend({
 		this.model.score = this.model.set('score', newScore);
 		($('.score', this.$el)).text(newScore);
 		this.trigger('change');
+		navigator.vibrate(50)
 	},
 	plus: function() {
-		play_single_sound();
 		this.incrementScore( 1 );
 	},
 	minus: function() {
