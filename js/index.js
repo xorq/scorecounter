@@ -302,6 +302,25 @@ var SessionsView = Backbone.View.extend({
 		this.trigger('delete');
 		this.trigger('change');
 	},
+	duplicate: function(item){
+		console.log('dupliacetetedzeze')
+		console.log(item.toJSON().players)
+		//this.collection.add(new Session({players: new Players({item.players.toJSON()})}));
+		var session = item.toJSON();
+		console.log(session.players.toJSON())
+		playersCollection = new Players(_.map(session.players.toJSON(), function(player, idp){
+				player.score = 0;
+				return new Player({id: player.id, score: player.score, name:player.name})
+			}));
+		console.log(playersCollection);
+		var laSession = new Session({pauseTime: session.pauseTime, paused: session.paused, startTime:session.startTime, finishTime:session.finishTime, id: Number(new Date), players:playersCollection})
+		
+		console.log(laSession);
+		this.collection.add(laSession);
+		this.trigger('change');
+		this.render();
+	},
+
 	render: function(gameID) {
 		console.log(gameID);
 		this.gameID = gameID
@@ -313,6 +332,7 @@ var SessionsView = Backbone.View.extend({
 			sessionView.render(gameID).$el.appendTo(sessionsHolder);
 			master.listenTo(sessionView, 'change', master.changed);
 			master.listenTo(sessionView, 'delete', master.deleted);
+			master.listenTo(sessionView, 'duplicate', master.duplicate);
 		})
 		$('.sessions').css('display','block');
 		$('#session-editor').attr('href','#sessionseditor?' + gameID);
@@ -327,8 +347,8 @@ var SessionsView = Backbone.View.extend({
 			x = e.originalEvent.targetTouches[0].pageX // anchor point
 		})
 		.on('touchmove', function(e) {
-			var change = 0.5 * (e.originalEvent.targetTouches[0].pageX - x)
-			change = Math.min(Math.max(-100, change), 000) // restrict to -100px left, 0px right
+			var change = (e.originalEvent.targetTouches[0].pageX - x)
+			change = Math.min(Math.max(-100, change), 100) // restrict to -100px left, 0px right
 			e.currentTarget.style.left = change + 'px'
 			// disable scroll once we hit 10px horizontal slide
 		})
@@ -358,7 +378,8 @@ var SessionsView = Backbone.View.extend({
 var SessionView = Backbone.View.extend({
 	template: _.template($('#sessionTemplate').text()),
 	events: {
-		'click .delete-btn	': 'deleteSession'
+		'click .delete-btn' : 'deleteSession',
+		'click .new-btn' : 'newGame'
 	},
 
 	render: function(gameID) {
@@ -393,6 +414,10 @@ var SessionView = Backbone.View.extend({
 		}
 		this.model.destroy();
 		this.trigger('delete');
+	},
+	newGame: function() {
+		console.log('duplaice')
+		this.trigger('duplicate', this.model);
 	}
 });
 
