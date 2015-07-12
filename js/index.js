@@ -271,8 +271,9 @@ var GameView = Backbone.View.extend({
 		}
 	},
 	editName: function() {
+		var oldName = this.model.get('name');
 		var newName = window.prompt('what name ?')
-		this.model.set('name', newName);
+		this.model.set('name', newName ? newName : oldName);
 		//this.render();
 		this.trigger('change')
 	},
@@ -301,6 +302,25 @@ var SessionsView = Backbone.View.extend({
 		this.trigger('delete');
 		this.trigger('change');
 	},
+	duplicate: function(item){
+		console.log('dupliacetetedzeze')
+		console.log(item.toJSON().players)
+		//this.collection.add(new Session({players: new Players({item.players.toJSON()})}));
+		var session = item.toJSON();
+		console.log(session.players.toJSON())
+		playersCollection = new Players(_.map(session.players.toJSON(), function(player, idp){
+				player.score = 0;
+				return new Player({id: player.id, score: player.score, name:player.name})
+			}));
+		console.log(playersCollection);
+		var laSession = new Session({pauseTime: session.pauseTime, paused: session.paused, startTime:session.startTime, finishTime:session.finishTime, id: Number(new Date), players:playersCollection})
+		
+		console.log(laSession);
+		this.collection.add(laSession);
+		this.trigger('change');
+		this.render();
+	},
+
 	render: function(gameID) {
 		console.log(gameID);
 		this.gameID = gameID
@@ -312,6 +332,7 @@ var SessionsView = Backbone.View.extend({
 			sessionView.render(gameID).$el.appendTo(sessionsHolder);
 			master.listenTo(sessionView, 'change', master.changed);
 			master.listenTo(sessionView, 'delete', master.deleted);
+			master.listenTo(sessionView, 'duplicate', master.duplicate);
 		})
 		$('.sessions').css('display','block');
 		$('#session-editor').attr('href','#sessionseditor?' + gameID);
@@ -326,8 +347,8 @@ var SessionsView = Backbone.View.extend({
 			x = e.originalEvent.targetTouches[0].pageX // anchor point
 		})
 		.on('touchmove', function(e) {
-			var change = 0.5 * (e.originalEvent.targetTouches[0].pageX - x)
-			change = Math.min(Math.max(-100, change), 000) // restrict to -100px left, 0px right
+			var change = (e.originalEvent.targetTouches[0].pageX - x)
+			change = Math.min(Math.max(-100, change), 100) // restrict to -100px left, 0px right
 			e.currentTarget.style.left = change + 'px'
 			// disable scroll once we hit 10px horizontal slide
 		})
@@ -357,7 +378,8 @@ var SessionsView = Backbone.View.extend({
 var SessionView = Backbone.View.extend({
 	template: _.template($('#sessionTemplate').text()),
 	events: {
-		'click .delete-btn	': 'deleteSession'
+		'click .delete-btn' : 'deleteSession',
+		'click .new-btn' : 'newGame'
 	},
 
 	render: function(gameID) {
@@ -392,6 +414,10 @@ var SessionView = Backbone.View.extend({
 		}
 		this.model.destroy();
 		this.trigger('delete');
+	},
+	newGame: function() {
+		console.log('duplaice')
+		this.trigger('duplicate', this.model);
 	}
 });
 
@@ -406,7 +432,7 @@ var TimerView = Backbone.View.extend({
 		'click .btn-finish-session' : 'finishSession',
 	},
 	render: function() {
-		master = this;
+		var master = this;
 		this.$el.html(this.template(this.model.toJSON()));
 		console.log(this.model.get('pauseTime'))
 		$('.clock').html(getDuration(this.model.get('startTime') && (0.001 * ((this.model.get('finishTime') || Number(new Date)) - (this.model.get('startTime') + this.model.get('pauseTime') + (this.model.get('paused') ? (Number(new Date) - this.model.get('paused') ) : 0))))))
@@ -448,6 +474,10 @@ var TimerView = Backbone.View.extend({
 		this.render();
 	},
 	finishSession: function() {
+		var finished = window.confirm('Finish Session ?');
+		if (!finished){
+			return
+		}
 		this.model.set('finishTime', Number(new Date));
 		if (this.model.get('paused')) {
 			this.model.set('pauseTime', this.model.get('pauseTime') + Number(new Date) - this.model.get('paused'));
@@ -471,11 +501,21 @@ var PlayersView = Backbone.View.extend({
 		this.trigger('change');
 	},
 	removedPlayer: function() {
+		var master = this;
+		var playersHolder = $('.players', this.$el);
+		playersHolder.empty();
+
+		this.model.get('players').each(function(item, id) {
+			var playerView = (new PlayerView({model: item}))
+			playerView.render().$el.appendTo(playersHolder);
+			master.listenTo(playerView, 'change', master.changed);
+			master.listenTo(playerView, 'delete', master.removedPlayer);
+		})
 		this.trigger('change');
-		this.render();
 	},
 	render: function() {
-		master = this;
+		var master = this;
+
 		//clearInterval(this.timer);
 		timerHolder = $('.timer', this.$el)
 		clearInterval(appScore.app.timer);
@@ -483,33 +523,7 @@ var PlayersView = Backbone.View.extend({
 		appScore.app.activeViews.push(timerView);
 		timerView.render().$el.appendTo(timerHolder);
 		this.listenTo(this.model, 'change', this.changed);
-		/*$('.timer').html('');
-		console.log(this.model.get('startTime'))
-		console.log(this.model.get('finishTime'))
-		if (this.model.get('startTime') && !this.model.get('finishTime')) {
-			$('.btn-pause-timer', this.$el).css('display', 'block');
-			$('.btn-finish-session', this.$el).css('display','block');
-			$('.btn-start-session', this.$el).css('display','none');
-			showTimer = function() {
-				$('.timer', master.$el).html(getDuration(0.001 * (Number(new Date) - (master.model.get('startTime') + master.model.get('pauseTime')))))
-			}
-			showTimer();
-			if (this.model.get('paused')){
-				
-			}
 
-		} else if (this.model.get('startTime') && this.model.get('finishTime')) {
-			clearInterval(this.timer);
-			$('.timer', this.$el).html(getDuration(0.001 * (master.model.get('finishTime') - master.model.get('startTime') - master.model.get('pauseTime'))));
-			$('.btn-start-session', this.$el).css('display','none');
-			$('.btn-finish-session', this.$el).css('display','none');
-			$('.btn-pause-timer', this.$el).css('display', 'none');
-			$('.btn-reset-timer', this.$el).css('display', 'block');
-		} else {
-			$('.btn-start-session', this.$el).css('display','block');
-			$('.btn-finish-session', this.$el).css('display','block');
-			$('.btn-pause-timer', this.$el).css('display', 'block');
-		}*/
 		var master = this;
 		var playersHolder = $('.players', this.$el);
 		playersHolder.empty();
@@ -519,6 +533,7 @@ var PlayersView = Backbone.View.extend({
 			playerView.render().$el.appendTo(playersHolder);
 			master.listenTo(playerView, 'change', master.changed);
 			master.listenTo(playerView, 'delete', master.removedPlayer);
+			//appScore.app.activeViews.push(playerView);
 		})
 		$('.players').css('display','block');
 		console.log(formatDate(this.model.get('id')))
@@ -528,9 +543,12 @@ var PlayersView = Backbone.View.extend({
 	},
 
 	addPlayer: function() {	
+		var master = this;
 		var playersHolder = $('.players', this.$el);
 		playersHolder.empty();
+
 		this.model.get('players').add((new Player({id: Number(new Date)})));
+		
 		this.model.get('players').each(function(item, id) {
 			var playerView = (new PlayerView({model: item}))
 			playerView.render().$el.appendTo(playersHolder);
@@ -538,7 +556,7 @@ var PlayersView = Backbone.View.extend({
 			master.listenTo(playerView, 'delete', master.removedPlayer);
 		})
 		this.trigger('change');
-		this.render();
+		//this.render();
 	},
 
 });
@@ -564,9 +582,9 @@ var PlayerView = Backbone.View.extend({
 		this.model.score = this.model.set('score', newScore);
 		($('.score', this.$el)).text(newScore);
 		this.trigger('change');
+		navigator.vibrate(50)
 	},
 	plus: function() {
-		play_single_sound();
 		this.incrementScore( 1 );
 	},
 	minus: function() {
@@ -627,11 +645,11 @@ appScore.app = {
 		this.activeViews.push( view );
 		view.render();
 		$('.ui-header h4').html('ScoreKeeper')
+
 	},
 
 	sessions: function(event, args) {
 		this.undelegateAll();
-
 		this.bindEvents();
 		this.gamesCollection.load();
 		var view = new SessionsView({ collection: (this.gamesCollection.get(args[1])).get('sessions') });
@@ -657,14 +675,6 @@ appScore.app = {
 
 		//Unelegant changes to the header
 		$('.btn-back').attr('href','#sessions?' + args[1])
-		//var timestamp = new Date(this.gamesCollection.get(args[1]).get('sessions').get(args[2]).get('id'));
-		//$('.ui-header h4').html(timestamp);
-		
-		//$('.ui-header').enhanceWithin();
-		//setup clock
-		//setInterval(function(){$('.timer').html(getDuration(0.001 * (Number(new Date) - args[1])))},1000)
-
-
 	},
 
 	bindEvents: function() {
@@ -687,10 +697,6 @@ appScore.app = {
 		var parentElement = document.getElementById(id);
 		var listeningElement = parentElement.querySelector('.listening');
 		var receivedElement = parentElement.querySelector('.received');
-
-		//listeningElement.setAttribute('style', 'display:none;');
-		//receivedElement.setAttribute('style', 'display:block;');
-
 		console.log('Received Event: ' + id);
 	}
 };
@@ -704,36 +710,3 @@ appScore.router = new $.mobile.Router(
 	appScore.app
 );
 
-/*
-​app = new Workspace();
-Backbone.history.start();
-main = new Main();
-app.navigate('new',{trigger:true});
-*/
-//var games = new Games();
-
-/*
-$(document).bind("mobileinit", function () {
-	$.mobile.ajaxEnabled = false;
-	$.mobile.linkBindingEnabled = false;
-	$.mobile.hashListeningEnabled = false;
-	$.mobile.pushStateEnabled = false;
-});
-
-
-$(document).ready(function () {
-	console.log('document ready');
-	appe = new AppRouter();
-	appe.on('route:session', function(id){
-		console.log(idp)
-	})
-	Backbone.history.start();
-});*/
-/*console.log(localStorage.games);
-var gamesCollection = new Games;
-var games = new GamesView({ collection: gamesCollection });
-games.render();
-*/
-/*
-
-*/
