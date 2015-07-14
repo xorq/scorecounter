@@ -294,8 +294,6 @@ var SessionsView = Backbone.View.extend({
 	//template: _.template($('#sessionsTemplate').text()),
 
 	changed: function() {
-		//this.render();
-		console.log('changed')
 		this.trigger('change');
 	},
 	deleted: function() {
@@ -304,22 +302,16 @@ var SessionsView = Backbone.View.extend({
 		this.trigger('change');
 	},
 	duplicate: function(item){
-		console.log('dupliacetetedzeze')
-		console.log(item.toJSON().players)
 		//this.collection.add(new Session({players: new Players({item.players.toJSON()})}));
 		var session = item.toJSON();
-		console.log(session.players.toJSON())
 		playersCollection = new Players(_.map(session.players.toJSON(), function(player, idp){
 				player.score = 0;
 				return new Player({id: player.id, score: player.score, name:player.name})
 			}));
-		console.log(playersCollection);
-		var laSession = new Session({pauseTime: session.pauseTime, paused: session.paused, startTime:session.startTime, finishTime:session.finishTime, id: Number(new Date), players:playersCollection})
-		
-		console.log(laSession);
+		var laSession = new Session({pauseTime: 0, paused: 0, startTime:0, finishTime:0, id: Number(new Date), players:playersCollection})
 		this.collection.add(laSession);
 		this.trigger('change');
-		this.render();
+		this.render(this.gameID);
 	},
 
 	render: function(gameID) {
@@ -418,7 +410,6 @@ var SessionView = Backbone.View.extend({
 		this.trigger('delete');
 	},
 	newGame: function() {
-		console.log('duplaice')
 		this.trigger('duplicate', this.model);
 	}
 });
@@ -586,7 +577,7 @@ var PlayerView = Backbone.View.extend({
 		currentScore.push(increment);
 		this.model.set('score', currentScore);
 		var currentTimestamps = this.model.get('timestamps');
-		currentTimestamps.push(Number(new Date()))
+		currentTimestamps.push(Number(new Date))
 		this.model.set('timestamps', currentTimestamps);
 		($('.score', this.$el)).text(_.reduce(currentScore, function(memo, num){ return memo + num; }, 0));
 		this.trigger('change');
@@ -663,7 +654,6 @@ appScore.app = {
 		var view = new SessionsView({ collection: (this.gamesCollection.get(args[1])).get('sessions') });
 		this.activeViews.push( view );
 		view.render(args[1]);
-
 		$('.ui-header h4').html(this.gamesCollection.get(args[1]).get('name'))
 		$('.btn-back').attr('href','#games')
 		this.gamesCollection.listenTo(view, 'change', this.gamesCollection.sync)
