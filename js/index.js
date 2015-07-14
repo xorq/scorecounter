@@ -73,7 +73,8 @@ var Player = Backbone.Model.extend({
 	defaults: {
 		id: Number(new Date),
 		name: '',
-		score: 0
+		score: [],
+		timestamps: []
 	},
 
 	sync: function() {
@@ -578,9 +579,15 @@ var PlayerView = Backbone.View.extend({
 	},
 	incrementScore: function(increment) {
 
-		var newScore = (this.model.get('score') ? this.model.get('score') : 0) + increment;
-		this.model.score = this.model.set('score', newScore);
-		($('.score', this.$el)).text(newScore);
+		//var newScore = (this.model.get('score') ? this.model.get('score') : 0) + increment;
+		//this.model.score = this.model.set('score', newScore);
+		var currentScore = this.model.get('score');
+		currentScore.push(increment);
+		this.model.set('score', currentScore);
+		var currentTimestamps = this.model.get('timestamps');
+		currentTimestamps.push(Number(new Date()))
+		this.model.set('timestamps', currentTimestamps);
+		($('.score', this.$el)).text(_.reduce(currentScore, function(memo, num){ return memo + num; }, 0));
 		this.trigger('change');
 		navigator.vibrate(50)
 	},

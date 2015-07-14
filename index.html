@@ -148,7 +148,7 @@
 							<input type="text" class='player-name' style="color:white;background:black" value='<%=name%>'></input>
 						</div>
 						<div class="ui-block-c" style='font-size:100%;text-align:center;height: 100%;width:18%'>
-							<text class='score' style=''><%=score%></text>
+							<text class='score' style=''><%=_.reduce(score, function(memo, num){ return memo + num; }, 0)%></text>
 						</div>
 						<div class="ui-block-d" style='width:17%;height:100%'>
 							<a style='height:100%;width:100%;margin:0px;padding:0px' class='plus ui-btn ui-btn-icon-notext ui-icon-plus' style='background-color:green'></a>
