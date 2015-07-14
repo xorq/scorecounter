@@ -305,7 +305,8 @@ var SessionsView = Backbone.View.extend({
 		//this.collection.add(new Session({players: new Players({item.players.toJSON()})}));
 		var session = item.toJSON();
 		playersCollection = new Players(_.map(session.players.toJSON(), function(player, idp){
-				player.score = 0;
+				player.score = [];
+				player.timestamps = [];
 				return new Player({id: player.id, score: player.score, name:player.name})
 			}));
 		var laSession = new Session({pauseTime: 0, paused: 0, startTime:0, finishTime:0, id: Number(new Date), players:playersCollection})
