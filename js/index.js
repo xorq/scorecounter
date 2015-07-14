@@ -388,13 +388,14 @@ var SessionView = Backbone.View.extend({
 		console.log(this.model.get('players').toJSON())
 		var scores = _.pluck(this.model.get('players').toJSON(), 'score')
 		var titleString = formatDate(Number(new Date(this.model.get('id')))).substr(4,5) + ' - ' + _.map(playersNames, function(name, index){
-			return name + ' ' + scores[index]
+			return name + ' ' + _.reduce(scores[index], function(memo, num){ return memo + num; }, 0)
 		}).join(' - ')
 
 		this.$el.html(this.template({
 			gameID: gameID,
 			id: this.model.get('id'),
-			timestamp: titleString
+			timestamp: titleString,
+			timer: this.model.get('startTime') && !this.model.get('finishTime')
 		}));
 
 
