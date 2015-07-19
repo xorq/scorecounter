@@ -633,7 +633,7 @@ var PlayersView = Backbone.View.extend({
 		}
 	    var buyers = $('#buyers').get(0).getContext('2d');
 	    buyers.canvas.width = $(window).width();
-		buyers.canvas.height = 0.5 * $(window).width();
+		buyers.canvas.height = 1 * $(window).width();
     	var chaarrt = new Chart(buyers).Line(buyerData, {bezierCurve: false, animation: false});
 	},
 	
