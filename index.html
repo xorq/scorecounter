@@ -38,6 +38,7 @@
 
 
 	<body>
+	
 		<div class='background'></div>
 	
 
@@ -52,19 +53,23 @@
 				<div>
 				<a data-role='button' class='btn-add-game ui-btn' style='color:green'>- New Game -</a>
 				</div>
+
 			</div>
+
 		</div>
 
 
 		<div id='session' data-role='page' class="ui-page-theme-b">
 			<div id="players" class="players" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
-					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button' style='top:0px;padding:10px'></a>
+					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button' style='top:2px;padding:10px'></a>
 					<a href='' class='btn-add-game ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:none'></a>
 					<h4 class='title' style='margin-left:60px;margin-right:0px;font-size:20px; text-align:left'></h4>
 				</div>
 				<div class="players"></div>
 				<a data-role='button' class='btn-add-player ui-btn' style='color:green'>- Add Player -</a>
+				<!--<a data-role='button' class='btn-reset-scores ui-btn' style='color:red'>- Reset Scores -</a>-->
+				<a data-role='button' class='btn-delete-last-record ui-btn' style='color:orange'>- Delete Last Entry-</a>
 				<div style='text-align:center; text-transform: none;' class="timer"></div>
 			</div>
 
@@ -82,20 +87,13 @@
 				<div>
 				<a data-role='button' class='btn-add-session ui-btn' style='color:green'>- New session -</a>
 				</div>
+
 			</div>
 		</div>
 
 
-	
-
-
-		
-
 		<div data-role="page" data-theme="b" id="title" data-title="Score Keeper">
 			<div class="app" style="width:100%" data-role="page" data-theme="b" id="scripts">
-
-
-
 
 				<script type='text/template' id='sessionsTemplate'>
 
@@ -108,15 +106,9 @@
 					<a data-role='button' class='btn-pause-timer ui-btn' style='color:green;display:<%=(!finishTime && startTime && !paused) ? "block" : "none"%>'>- Pause Timer -</a>
 					<a data-role='button' class='btn-continue-timer ui-btn' style='color:green;display:<%=(!finishTime && startTime && paused) ? "block" : "none"%>'>- Continue -</a>
 					<a data-role='button' class='btn-reset-timer ui-btn' style='color:green;display:<%=(startTime==0 && finishTime==0) ? "none" : "block"'>- Reset Timer -</a>
+					<canvas id="buyers" width="600" height="400"></canvas>
 				</script>
 
-				<!--<script type='text/template' id='playersTemplate'>
-					<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
-						<a href='' class='btn-back-sessions ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button'></a>
-						<a href='' class='btn-add-player ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button'></a>
-						<text style='font-size:22px'> ScoreKeeper </text>
-					</div>
-				</script>-->
 
 				<script type='text/template' id='gameTemplate'>
 					<ul class="ui-listview" data-role="listview" data-type="horizontal">
@@ -161,9 +153,12 @@
 						</div>
 					</div>
 				</script>
+
 			</div>
+
 		</div>
-		<!--<script type="text/javascript" src="cordova.js"></script>-->
+
+		
 
 		
 		<script type='text/javascript' src='bower_components/jquery/jquery.min.js'></script>
@@ -172,15 +167,17 @@
 		<script type='text/javascript' src='bower_components/bootstrap/dist/js/bootstrap.min.js'></script>
 		<script type='text/javascript' src='bower_components/underscore/underscore-min.js'></script>
 		<script type='text/javascript' src='bower_components/backbone/backbone.js'></script>
-		<script type='text/javascript' src='bower_components/backbone.touch/backbone.touch.js'></script>*
+		<script type="text/javascript" src='bower_components/Chart.js/Chart.js'></script>
+		<script type='text/javascript' src='bower_components/backbone.touch/backbone.touch.js'></script>
 		<script type="text/javascript" src="js/index.js"></script>
-		<audio id="audiotag1" src="happy.m4a" preload="auto"></audio>
-		<a href="javascript:play_single_sound();">Play 5-sec sound on single channel</a>
-		<script type="text/javascript">
-			function play_single_sound() {
-				document.getElementById('audiotag1').play();
-			}
-		</script>
+
+
+
+<script>
+
+
+</script>
+
 
 	</body>
 </html>
