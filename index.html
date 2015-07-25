@@ -35,46 +35,37 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 </div><!-- /page -->
-
-
 	<body>
-	
 		<div class='background'></div>
 	
-
 		<div id="games" data-role="page" data-theme="b">
 			<div id="games" class="games" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
 					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-home ui-btn-icon-notext' data-role='button' role='button' style='display:none'></a>
 					<a href='#gameseditor' class='btn-edit-game ui-btn-right ui-btn ui-icon-edit ui-btn-icon-notext' data-role='button' role='button' style='padding:0px; display:none'></a>
-					<h4 style='margin:0px;font-size:22px; text-align:center'> ScoreKeeper </h4>
+					<h4 class='app-name' style='margin:0px;font-size:22px; text-align:center'> ScoreKeeper </h4>
 				</div>
 				<div class="games"></div>
 				<div>
 				<a data-role='button' class='btn-add-game ui-btn' style='color:green'>- New Game -</a>
 				</div>
-
 			</div>
-
 		</div>
-
 
 		<div id='session' data-role='page' class="ui-page-theme-b">
 			<div id="players" class="players" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
 					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button' style='top:2px;padding:10px'></a>
-					<a href='' class='btn-add-game ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:none'></a>
-					<h4 class='title' style='margin-left:60px;margin-right:0px;font-size:20px; text-align:left'></h4>
+					<a href='' class='btn-session-function ui-btn-right ui-btn' data-role='button' role='button' style='padding:10px;top:8px'></a>
+					<h4 class='session-title' style='margin-left:60px;margin-right:0px;font-size:20px; text-align:center'></h4>
 				</div>
 				<div class="players"></div>
 				<a data-role='button' class='btn-add-player ui-btn' style='color:green'>- Add Player -</a>
 				<!--<a data-role='button' class='btn-reset-scores ui-btn' style='color:red'>- Reset Scores -</a>-->
+				<canvas id="buyers" width="600" height="400"></canvas>
 				<a data-role='button' class='btn-delete-last-record ui-btn' style='color:orange'>- Delete Last Entry-</a>
-				<div style='text-align:center; text-transform: none;' class="timer"></div>
 			</div>
-
 		</div>
-
 
 		<div id="sessions" data-role="page" data-theme="b">
 			<div id="sessions" class="sessions" data-role="page" data-theme="b">
@@ -87,28 +78,20 @@
 				<div>
 				<a data-role='button' class='btn-add-session ui-btn' style='color:green'>- New session -</a>
 				</div>
-
 			</div>
 		</div>
 
 
 		<div data-role="page" data-theme="b" id="title" data-title="Score Keeper">
 			<div class="app" style="width:100%" data-role="page" data-theme="b" id="scripts">
-
-				<script type='text/template' id='sessionsTemplate'>
-
-				</script> 
-
 				<script type='text/template' id='timerTemplate'>
-					<a data-role='' class='clock' style='display:block'></a>
+					<!--<a data-role='' class='clock' style='display:block'></a>-->
 					<a data-role='button' class='btn-start-session ui-btn' style='color:green;display:<%=startTime && "none"%>'>- Start Session -</a>
 					<a data-role='button' class='btn-finish-session ui-btn' style='color:green;display:<%=(!finishTime && startTime) ? "block" : "none"%>'>- Finish Session -</a>
 					<a data-role='button' class='btn-pause-timer ui-btn' style='color:green;display:<%=(!finishTime && startTime && !paused) ? "block" : "none"%>'>- Pause Timer -</a>
 					<a data-role='button' class='btn-continue-timer ui-btn' style='color:green;display:<%=(!finishTime && startTime && paused) ? "block" : "none"%>'>- Continue -</a>
-					<a data-role='button' class='btn-reset-timer ui-btn' style='color:green;display:<%=(startTime==0 && finishTime==0) ? "none" : "block"'>- Reset Timer -</a>
-					<canvas id="buyers" width="600" height="400"></canvas>
+					<a data-role='button' class='btn-reset-timer ui-btn' style='color:green;display:<%=(finishTime==0) || (startTime==0 && !(finishTime==0)) ? "none" : "block"%>'>- Reset Timer -</a>
 				</script>
-
 
 				<script type='text/template' id='gameTemplate'>
 					<ul class="ui-listview" data-role="listview" data-type="horizontal">
@@ -131,9 +114,9 @@
 							</div>
 							<a href='#session?<%=gameID%>?<%=id%>' data-role='button' data-transition='slide' class='btn-game-name ui-btn ui-icon-carat-r ui-btn-icon-right' style='background-color:<%=timer ? "green" : "default"%>'><%=timestamp%></a>
 						</li>
-
 					</ul>
 				</script>
+
 				<script type='text/template' id='playerTemplate'>
 					<div class="ui-grid-a" style='height:50px'>
 						<div class='ui-block-b' style='width:33%;height: 100%;'>
@@ -153,14 +136,9 @@
 						</div>
 					</div>
 				</script>
-
 			</div>
-
 		</div>
 
-		
-
-		
 		<script type='text/javascript' src='bower_components/jquery/jquery.min.js'></script>
 		<script type='text/javascript' src="js/jquery.mobile.router.min.js"></script>
 		<script type='text/javascript' src="bower_components/jquery-mobile/js/jquery.mobile-1.4.5.min.js"></script>
@@ -170,14 +148,6 @@
 		<script type="text/javascript" src='bower_components/Chart.js/Chart.js'></script>
 		<script type='text/javascript' src='bower_components/backbone.touch/backbone.touch.js'></script>
 		<script type="text/javascript" src="js/index.js"></script>
-
-
-
-<script>
-
-
-</script>
-
 
 	</body>
 </html>

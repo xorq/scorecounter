@@ -1,5 +1,3 @@
-
-
 function formatDate(d) { 
   var d = parseInt(d)
   var d = new Date(d);
@@ -18,10 +16,9 @@ function formatDate(d) {
   var min = d.getMinutes() % 100;
   if ( min < 10 ) min = '0' + min;
   return daysOfWeek[d.getDay()].substr(0,3) + ' ' + dd + '/' + mm + '/' + yy + ' - ' + hh + ':' + min
-}
+};
 
 function getDuration(s) {
-
 	var years = Math.floor( s / 31557600)
 	var days = Math.floor( (s % 31557600) / 86400 );
 	var hours = Math.floor( ((s % 31557600) % 86400) / 3600 ) ;
@@ -37,7 +34,7 @@ function getDuration(s) {
 		return result
 	}
 	return returnResult(years, days, hours, minutes) + seconds + 's'
-}
+};
 
 //console.log(getDuration(1000000000))
  /*
@@ -67,7 +64,6 @@ var clickEvent = window.isTouchDevice ? 'touchstart' : 'click';
  *       Session (id, players (collection of Player models))
  *          Player (id, name, score)
  */
-
 
 var Player = Backbone.Model.extend({
 	defaults: {
@@ -115,7 +111,6 @@ var Sessions = Backbone.Collection.extend({
 	sync: function() {
 		this.trigger('change');
 	}
-
 });
 
 var Game = Backbone.Model.extend({
@@ -145,11 +140,9 @@ var Games = Backbone.Collection.extend({
 
 	load: function() {	
 		var data = $.parseJSON(localStorage.getItem('games'));
-
 		this.reset(_.map(data, function(item, id){
 			sessionsCollection = new Sessions(_.map(item.sessions, function(session,idx){
 				playersCollection = new Players(_.map(session.players, function(player, idp){
-					console.log(typeof(player.score))
 					if (typeof(player.score) == 'number'){
 						player.timestamps = _.map(Array(player.score), function(a, b) {
 							return session.id + b * 120000 + 60001 * idp
@@ -217,7 +210,6 @@ var GamesView = Backbone.View.extend({
 		$('.games').css('display','block');
 			$('.ui-listview li > a')
 		.on('touchstart', function(e) {
-			console.log(e.originalEvent.pageX)
 			$('.ui-listview li > a.open').css('left', '0px').removeClass('open') // close em all
 			$(e.currentTarget).addClass('open')
 			x = e.originalEvent.targetTouches[0].pageX // anchor point
@@ -325,7 +317,6 @@ var SessionsView = Backbone.View.extend({
 	},
 
 	render: function(gameID) {
-		console.log(gameID);
 		this.gameID = gameID
 		var master = this;
 		var sessionsHolder = $('.sessions', this.$el);
@@ -387,21 +378,16 @@ var SessionView = Backbone.View.extend({
 
 	render: function(gameID) {
 		var playersNames = _.pluck(this.model.get('players').toJSON(), 'name')
-		console.log(this.model.get('players').toJSON())
 		var scores = _.pluck(this.model.get('players').toJSON(), 'score')
 		var titleString = formatDate(Number(new Date(this.model.get('id')))).substr(4,5) + ' - ' + _.map(playersNames, function(name, index){
 			return name + ' ' + _.reduce(scores[index], function(memo, num){ return memo + num; }, 0)
 		}).join(' - ')
-
 		this.$el.html(this.template({
 			gameID: gameID,
 			id: this.model.get('id'),
 			timestamp: titleString,
 			timer: this.model.get('startTime') && !this.model.get('finishTime')
 		}));
-
-
-
 		return this;
 	}, 
 	changed: function() {
@@ -434,19 +420,40 @@ var TimerView = Backbone.View.extend({
 		'click .btn-reset-timer' : 'resetTimer',
 		'click .btn-finish-session' : 'finishSession',
 	},
-	render: function() {
+
+	render: function() {	
 		var master = this;
 		this.$el.html(this.template(this.model.toJSON()));
-		console.log(this.model.get('pauseTime'))
-		$('.clock').html(getDuration(this.model.get('startTime') && (0.001 * ((this.model.get('finishTime') || Number(new Date)) - (this.model.get('startTime') + this.model.get('pauseTime') + (this.model.get('paused') ? (Number(new Date) - this.model.get('paused') ) : 0))))))
-		if (!this.model.get('paused') && this.model.get('startTime') && !this.model.get('finishTime')) {
+		console.log("rendering")
+		$('.ui-title').html(getDuration(this.model.get('startTime') && (0.001 * ((this.model.get('finishTime') || Number(new Date)) - (this.model.get('startTime') + this.model.get('pauseTime') + (this.model.get('paused') ? (Number(new Date) - this.model.get('paused') ) : 0))))))
+		/*if (!this.model.get('paused') && this.model.get('startTime') && !this.model.get('finishTime')) {
 			appScore.app.timer = setInterval(function(){
-				$('.clock').html(getDuration( master.model.get('startTime') && (0.001 * ( (master.model.get('finishTime') || Number(new Date)) - (master.model.get('startTime') + master.model.get('pauseTime') )) )))
+				$('.ui-title').html(getDuration( master.model.get('startTime') && (0.001 * ( (master.model.get('finishTime') || Number(new Date)) - (master.model.get('startTime') + master.model.get('pauseTime') )) )))
 			},1000)
-		}
-		this.model.trigger('change');
+		}*/
+		//this.model.trigger('change');
 
 		return this
+	},
+	getState: function() {
+		var startTime = this.model.get('startTime');
+		var finishTime = this.model.get('finishTime');
+		var paused = this.model.get('paused');
+		var stopTime = this.model.get('stopTime');
+		//var pauseTime = this.model.get('pauseTime');
+		if (startTime && paused) {
+			return 'paused'
+		};
+		if (startTime && finishTime) {
+			return 'finished'
+		};
+		if (!startTime && !finishTime) {
+			return 'not_started'
+		};
+		if (startTime && !finishTime) {
+			return 'started'
+		};
+
 	},
 	pause: function() {
 		this.model.set('paused', Number(new Date))
@@ -456,9 +463,12 @@ var TimerView = Backbone.View.extend({
 	continueTimer: function() {
 		this.model.set('pauseTime', this.model.get('pauseTime') + Number(new Date) - this.model.get('paused'))
 		this.model.set('paused', 0)
+		console.log('continuing')
+		console.log(this.model.get('paused'))
 		this.render();
 	},
 	startSession: function() {
+		console.log('starting')
 		$('.timer').html('0s');
 		this.model.set('startTime', Number(new Date))
 		this.trigger('change')
@@ -493,15 +503,159 @@ var TimerView = Backbone.View.extend({
 	},
 });
 
-
 var PlayersView = Backbone.View.extend({
 	el: $('.players'),
 	events: {
 		'click .btn-add-player': 'addPlayer',
 		'click .btn-reset-scores': 'resetScores',
-		'click .btn-delete-last-record': 'deleteLastRecord'
+		'click .btn-delete-last-record': 'deleteLastRecord',
+		'click .session-title': 'pauseButton',
+		'click .btn-session-function': 'sessionFunction'
 	},
+
 	template: _.template($('#playersTemplate').text()),
+	
+	resetTimer: function() {
+		var sure = window.confirm('sure ?');
+		if (!sure){
+			return
+		}
+		this.model.set('finishTime', 0);
+		this.model.set('startTime', 0);
+		this.model.set('paused', 0);
+		this.model.set('pauseTime', 0);
+		clearInterval(appScore.app.timer);
+		this.trigger('change');
+		this.render();
+	},
+
+	pauseTimer: function() {
+		this.model.set('paused', Number(new Date))
+		clearInterval(appScore.app.timer);
+		appScore.app.timer = null;
+	},
+
+	continueTimer: function() {
+		this.model.set('pauseTime', this.model.get('pauseTime') + Number(new Date) - this.model.get('paused'))
+		this.model.set('paused', 0)
+		console.log('continuing')
+		this.render();
+		this.showTimer();
+	},
+
+	pauseButton: function() {
+		var currentState = this.getState();
+		console.log(currentState)
+		if (currentState == 'started') {
+			console.log('pausing');
+			$('.session-title').css('color','red').html($('.session-title').html() + ' (PAUSED)')
+			this.pauseTimer();
+			return
+		};
+		if (currentState == 'paused') {
+			console.log('continuing')
+			$('.session-title').css('color','white')
+			this.continueTimer();
+			return
+		}
+	},
+
+	finishSession: function() {
+		var finished = window.confirm('Finish Session ?');
+		if (!finished){
+			return
+		}
+		this.model.set('finishTime', Number(new Date));
+		if (this.model.get('paused')) {
+			this.model.set('pauseTime', this.model.get('pauseTime') + Number(new Date) - this.model.get('paused'));
+			this.model.set('paused', 0);
+		}
+		clearInterval(appScore.app.timer);
+		this.trigger('change');
+		this.render();
+	},
+
+	startSession: function() {
+		if (!this.model.get('startTime')) {
+			var master = this;
+			this.model.set('startTime', Number(new Date))
+			this.trigger('change')
+			this.render();
+		}
+	},
+
+	showTimer: function() {
+		var master = this;
+		var displayTimer = function() {
+			$('.session-title').html(getDuration( master.model.get('startTime') && (0.001 * ( (master.model.get('finishTime') || Number(new Date)) - (master.model.get('startTime') + master.model.get('pauseTime') + (master.model.get('paused') ? Number(new Date) - master.model.get('paused') : 0) )  ) )))
+		};
+		displayTimer();
+
+		clearInterval(appScore.app.timer);
+		appScore.app.timer = null;
+
+		if (this.getState() == 'started') {
+			console.log('creating timer')
+			clearInterval(appScore.app.timer);
+			appScore.app.timer = setInterval(function(){
+				displayTimer();
+			},1000)
+			console.log(appScore.app.timer)
+		}
+		console.log(appScore.app.timer);
+	},
+
+	drawFunctionButton: function() {
+		var startTime = this.model.get('startTime');
+		var finishTime = this.model.get('finishTime');
+		var buttonLabel = startTime && !finishTime ? 'Finish' : 'Start';
+		var buttonLabel = finishTime ? 'Reset' : buttonLabel;
+		$('.btn-session-function').html(buttonLabel)
+		var state = this.getState();
+		(state == 'started') || (state =='finished') ? $('.btn-add-player').css('display','none') :  $('.btn-add-player').css('display','block')
+	},
+
+	sessionFunction: function() {
+		var startTime = this.model.get('startTime');
+		var finishTime = this.model.get('finishTime');
+		var buttonLabel = startTime && !finishTime ? 'Finish' : 'Start';
+		var buttonLabel = finishTime ? 'Reset' : buttonLabel;
+		$('.btn-session-function').html(buttonLabel)
+		console.log(buttonLabel)
+		if (buttonLabel == 'Finish') {
+			this.finishSession();
+			return
+		};
+		if (buttonLabel == 'Start') {
+			this.startSession();
+			return
+		};
+		if (buttonLabel == 'Reset') {
+			console.log('resset')
+			this.resetTimer();
+			return
+		};
+	},
+
+	getState: function() {
+		var startTime = this.model.get('startTime');
+		var finishTime = this.model.get('finishTime');
+		var paused = this.model.get('paused');
+		var stopTime = this.model.get('stopTime');
+		//var pauseTime = this.model.get('pauseTime');
+		if (startTime && paused) {
+			return 'paused'
+		};
+		if (startTime && finishTime) {
+			return 'finished'
+		};
+		if (!startTime && !finishTime) {
+			return 'not_started'
+		};
+		if (startTime && !finishTime) {
+			return 'started'
+		};
+	},
 
 	changed: function() {
 		this.trigger('change');
@@ -518,11 +672,13 @@ var PlayersView = Backbone.View.extend({
 			playerView.render().$el.appendTo(playersHolder);
 			master.listenTo(playerView, 'change', master.changed);
 			master.listenTo(playerView, 'delete', master.removedPlayer);
+			master.listenTo(playerView, 'start', master.startSession);
 		})
 		this.trigger('change');
 	},
 
 	resetScores: function() {
+
 		var conf = window.confirm('Reset Scores?');
 		if (!conf) {
 			return
@@ -560,35 +716,39 @@ var PlayersView = Backbone.View.extend({
 
 	render: function() {
 		var master = this;
-		//clearInterval(this.timer);
-		timerHolder = $('.timer', this.$el)
+
+		console.log(appScore.app.timer)
 		clearInterval(appScore.app.timer);
-		timerView = new TimerView({model: this.model});
-		appScore.app.activeViews.push(timerView);
-		timerView.render().$el.appendTo(timerHolder);
+		appScore.app.timer = 0;
+
 		this.listenTo(this.model, 'change', this.changed);
 
 		var master = this;
 		var playersHolder = $('.players', this.$el);
 		playersHolder.empty();
-		console.log(this.model)
 		this.model.get('players').each(function(item, id) {
 			var playerView = (new PlayerView({model: item}))
 			playerView.render().$el.appendTo(playersHolder);
 			master.listenTo(playerView, 'change', master.changed);
 			master.listenTo(playerView, 'delete', master.removedPlayer);
-			//appScore.app.activeViews.push(playerView);
+			master.listenTo(playerView, 'start', master.startSession);
 		})
 		$('.players').css('display','block');
-		console.log(formatDate(this.model.get('id')))
-		$('h4', this.$el).html(formatDate(this.model.get('id')));
-		$('timer', this.$el).html()
-		//var increments = _.pluck(this.model.get('players').toJSON(),'score');
-		setTimeout(function() {master.displayChart()}, 0);
-		//console.log(this.displayChart)
+
+		this.showTimer();
+
+		setTimeout(_.bind(master.displayChart, master),0)//console.log(this.displayChart)
+		console.log(this.getState())
+		if (this.getState() == 'paused') {
+			$('.session-title').css('color','red').html($('.session-title').html() + ' (PAUSED)')
+		} else {
+			$('.session-title').css('color','white');
+		};
+		this.drawFunctionButton();
 	},
 
 	displayChart: function(){
+		Chart.defaults.global.responsive = false;
 		var master = this;
 		var allLabels = [];
 		_.each(_.pluck(master.model.get('players').toJSON(),'timestamps'), function(item){
@@ -617,15 +777,13 @@ var PlayersView = Backbone.View.extend({
 		dataset = _.map(results, function(result, index){
 
 			return {
-						fillColor : "rgba(0,194,132,0.2)",
-						strokeColor : listOfColors[index],
-						pointColor : listOfColors[index],//"#fff",
-						pointStrokeColor : listOfColors[index],
-						data : result,
-						label : 'caca'
-					}
+				fillColor : "rgba(0,194,132,0.2)",
+				strokeColor : listOfColors[index],
+				pointColor : listOfColors[index],//"#fff",
+				pointStrokeColor : listOfColors[index],
+				data : result
+			}
 		})
-		
 
 		var buyerData = {
 			labels :  allFormattedLabels,//["January","February","March","April","May","June"],
@@ -634,7 +792,7 @@ var PlayersView = Backbone.View.extend({
 	    var buyers = $('#buyers').get(0).getContext('2d');
 	    buyers.canvas.width = $(window).width();
 		buyers.canvas.height = 1 * $(window).width();
-    	var chaarrt = new Chart(buyers).Line(buyerData, {bezierCurve: false, animation: false});
+    	var chaarrt = new Chart(buyers).Line(buyerData, {responsive: false, bezierCurve: false, animation: false});
 	},
 	
 
@@ -643,8 +801,8 @@ var PlayersView = Backbone.View.extend({
 		var playersHolder = $('.players', this.$el);
 		playersHolder.empty();
 
-		this.model.get('players').add((new Player({id: Number(new Date)})));
-		
+		this.model.get('players').add((new Player({id: Number(new Date), timestamps:[], score:[]})));
+		this.model.get('players')
 		this.model.get('players').each(function(item, id) {
 			var playerView = (new PlayerView({model: item}))
 			playerView.render().$el.appendTo(playersHolder);
@@ -652,6 +810,7 @@ var PlayersView = Backbone.View.extend({
 			master.listenTo(playerView, 'delete', master.removedPlayer);
 		})
 		this.trigger('change');
+		$('.player-name').focus()
 		//this.render();
 	}
 
@@ -665,14 +824,13 @@ var PlayerView = Backbone.View.extend({
 		'change .player-name': 'rename',
 		'click .plus': 'plus',
 		'click .minus': 'minus',
-		'mousedown .plus': 'vibrate',
-		'mousedown .minus': 'vibrate',
+		'touchstart .plus': 'vibrate',
+		'touchstart .minus': 'vibrate',
 		'click .btn-remove': 'delete',
 		'keyup .player-name': 'rename'
 	},
 
 	vibrate: function() {
-		console.log('vibrating')
 		navigator.vibrate(100)
 	},
 
@@ -682,9 +840,6 @@ var PlayerView = Backbone.View.extend({
 	},
 
 	incrementScore: function(increment) {
-
-		//var newScore = (this.model.get('score') ? this.model.get('score') : 0) + increment;
-		//this.model.score = this.model.set('score', newScore);
 		var currentScore = this.model.get('score');
 		currentScore.push(increment);
 		this.model.set('score', currentScore);
@@ -697,10 +852,12 @@ var PlayerView = Backbone.View.extend({
 
 	plus: function() {
 		this.incrementScore( 1 );
+		//this.trigger('start');
 	},
 
 	minus: function() {
 		this.incrementScore( -1 );
+		//this.trigger('start');
 	},
 
 	delete: function() {
@@ -749,6 +906,7 @@ appScore.app = {
 				console.log(err)
 			}
 		})
+		this.activeViews = []
 	},
 
 	games: function(event, args) {
@@ -759,18 +917,20 @@ appScore.app = {
 		var view = new GamesView({ collection: this.gamesCollection })
 		this.activeViews.push( view );
 		view.render();
-		$('.ui-header h4').html('ScoreKeeper')
+		$('.app-name').html('ScoreKeeper')
 
 	},
 
 	sessions: function(event, args) {
+
 		this.undelegateAll();
+		
 		this.bindEvents();
 		this.gamesCollection.load();
 		var view = new SessionsView({ collection: (this.gamesCollection.get(args[1])).get('sessions') });
 		this.activeViews.push( view );
 		view.render(args[1]);
-		$('.ui-header h4').html(this.gamesCollection.get(args[1]).get('name'))
+		$('.title').html(this.gamesCollection.get(args[1]).get('name'))
 		$('.btn-back').attr('href','#games')
 		this.gamesCollection.listenTo(view, 'change', this.gamesCollection.sync)
 
@@ -778,7 +938,6 @@ appScore.app = {
 
 	session: function(event, args) {
 		this.undelegateAll();
-
 		this.bindEvents();
 		this.gamesCollection.load();
 		var view = new PlayersView({ model: (this.gamesCollection.get(args[1])).get('sessions').get(args[2]) });
