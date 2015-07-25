@@ -132,7 +132,6 @@ var Games = Backbone.Collection.extend({
 
 	initialize: function(options) {
 		this.load()
-		console.log('loaded')
 		this.listenTo(this, 'change', this.sync);
 		this.listenTo(this, 'add', this.sync);
 		this.listenTo(this, 'remove', this.sync);
@@ -160,7 +159,7 @@ var Games = Backbone.Collection.extend({
 	},
 
 	sync: function() {
-		console.log('saved to localstorage')
+		//console.log('saved to localstorage')
 		localStorage.setItem('games', JSON.stringify(this));
 	}
 });
@@ -280,10 +279,10 @@ var GameView = Backbone.View.extend({
 		this.trigger('change')
 	},
 
-	showSessions: function() {
+	/*showSessions: function() {
 		this.trigger('left');
 		console.log('requested sessions of game of ID:' + this.model.get('id'));
-	},
+	},*/
 });
 
 var SessionsView = Backbone.View.extend({
@@ -410,99 +409,6 @@ var SessionView = Backbone.View.extend({
 	}
 });
 
-var TimerView = Backbone.View.extend({
-	el: $('.timer'),
-	template: _.template($('#timerTemplate').text()),
-	events: {
-		'click .btn-pause-timer' : 'pause',
-		'click .btn-continue-timer' : 'continueTimer',
-		'click .btn-start-session' : 'startSession',
-		'click .btn-reset-timer' : 'resetTimer',
-		'click .btn-finish-session' : 'finishSession',
-	},
-
-	render: function() {	
-		var master = this;
-		this.$el.html(this.template(this.model.toJSON()));
-		console.log("rendering")
-		$('.ui-title').html(getDuration(this.model.get('startTime') && (0.001 * ((this.model.get('finishTime') || Number(new Date)) - (this.model.get('startTime') + this.model.get('pauseTime') + (this.model.get('paused') ? (Number(new Date) - this.model.get('paused') ) : 0))))))
-		/*if (!this.model.get('paused') && this.model.get('startTime') && !this.model.get('finishTime')) {
-			appScore.app.timer = setInterval(function(){
-				$('.ui-title').html(getDuration( master.model.get('startTime') && (0.001 * ( (master.model.get('finishTime') || Number(new Date)) - (master.model.get('startTime') + master.model.get('pauseTime') )) )))
-			},1000)
-		}*/
-		//this.model.trigger('change');
-
-		return this
-	},
-	getState: function() {
-		var startTime = this.model.get('startTime');
-		var finishTime = this.model.get('finishTime');
-		var paused = this.model.get('paused');
-		var stopTime = this.model.get('stopTime');
-		//var pauseTime = this.model.get('pauseTime');
-		if (startTime && paused) {
-			return 'paused'
-		};
-		if (startTime && finishTime) {
-			return 'finished'
-		};
-		if (!startTime && !finishTime) {
-			return 'not_started'
-		};
-		if (startTime && !finishTime) {
-			return 'started'
-		};
-
-	},
-	pause: function() {
-		this.model.set('paused', Number(new Date))
-		clearInterval(appScore.app.timer);
-		this.render()
-	},
-	continueTimer: function() {
-		this.model.set('pauseTime', this.model.get('pauseTime') + Number(new Date) - this.model.get('paused'))
-		this.model.set('paused', 0)
-		console.log('continuing')
-		console.log(this.model.get('paused'))
-		this.render();
-	},
-	startSession: function() {
-		console.log('starting')
-		$('.timer').html('0s');
-		this.model.set('startTime', Number(new Date))
-		this.trigger('change')
-		this.render();
-	},
-	resetTimer: function() {
-		var sure = window.confirm('sure ?');
-		if (!sure){
-			return
-		}
-		this.model.set('finishTime', 0);
-		this.model.set('startTime', 0);
-		this.model.set('paused', 0);
-		this.model.set('pauseTime', 0);
-		clearInterval(appScore.app.timer);
-		this.trigger('change');
-		this.render();
-	},
-	finishSession: function() {
-		var finished = window.confirm('Finish Session ?');
-		if (!finished){
-			return
-		}
-		this.model.set('finishTime', Number(new Date));
-		if (this.model.get('paused')) {
-			this.model.set('pauseTime', this.model.get('pauseTime') + Number(new Date) - this.model.get('paused'));
-			this.model.set('paused', 0);
-		}
-		clearInterval(appScore.app.timer);
-		this.trigger('change');
-		this.render();
-	},
-});
-
 var PlayersView = Backbone.View.extend({
 	el: $('.players'),
 	events: {
@@ -538,22 +444,18 @@ var PlayersView = Backbone.View.extend({
 	continueTimer: function() {
 		this.model.set('pauseTime', this.model.get('pauseTime') + Number(new Date) - this.model.get('paused'))
 		this.model.set('paused', 0)
-		console.log('continuing')
 		this.render();
 		this.showTimer();
 	},
 
 	pauseButton: function() {
 		var currentState = this.getState();
-		console.log(currentState)
 		if (currentState == 'started') {
-			console.log('pausing');
 			$('.session-title').css('color','red').html($('.session-title').html() + ' (PAUSED)')
 			this.pauseTimer();
 			return
 		};
 		if (currentState == 'paused') {
-			console.log('continuing')
 			$('.session-title').css('color','white')
 			this.continueTimer();
 			return
@@ -595,14 +497,11 @@ var PlayersView = Backbone.View.extend({
 		appScore.app.timer = null;
 
 		if (this.getState() == 'started') {
-			console.log('creating timer')
 			clearInterval(appScore.app.timer);
 			appScore.app.timer = setInterval(function(){
 				displayTimer();
 			},1000)
-			console.log(appScore.app.timer)
 		}
-		console.log(appScore.app.timer);
 	},
 
 	drawFunctionButton: function() {
@@ -621,7 +520,6 @@ var PlayersView = Backbone.View.extend({
 		var buttonLabel = startTime && !finishTime ? 'Finish' : 'Start';
 		var buttonLabel = finishTime ? 'Reset' : buttonLabel;
 		$('.btn-session-function').html(buttonLabel)
-		console.log(buttonLabel)
 		if (buttonLabel == 'Finish') {
 			this.finishSession();
 			return
@@ -631,7 +529,6 @@ var PlayersView = Backbone.View.extend({
 			return
 		};
 		if (buttonLabel == 'Reset') {
-			console.log('resset')
 			this.resetTimer();
 			return
 		};
@@ -717,7 +614,6 @@ var PlayersView = Backbone.View.extend({
 	render: function() {
 		var master = this;
 
-		console.log(appScore.app.timer)
 		clearInterval(appScore.app.timer);
 		appScore.app.timer = 0;
 
@@ -737,8 +633,7 @@ var PlayersView = Backbone.View.extend({
 
 		this.showTimer();
 
-		setTimeout(_.bind(master.displayChart, master),0)//console.log(this.displayChart)
-		console.log(this.getState())
+		setTimeout(_.bind(master.displayChart, master),0)
 		if (this.getState() == 'paused') {
 			$('.session-title').css('color','red').html($('.session-title').html() + ' (PAUSED)')
 		} else {
@@ -873,7 +768,6 @@ var PlayerView = Backbone.View.extend({
 	},
 
 	rename: function() {
-		console.log('reefz')
 		var newName = $('.player-name', this.$el).val();
 		this.model.set('name', newName);
 		this.trigger('change');
@@ -890,7 +784,6 @@ appScore.app = {
 	// Application Constructor
 	initialize: function() {
 		this.bindEvents();
-		console.log('initialized')
 	},
 	// Bind Event Listeners
 	//
