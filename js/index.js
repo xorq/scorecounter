@@ -69,8 +69,8 @@ var Player = Backbone.Model.extend({
 	defaults: {
 		id: Number(new Date),
 		name: '',
-		score: [],
-		timestamps: []
+		score: [0],
+		timestamps: [Number(new Date)]
 	},
 
 	sync: function() {
@@ -296,11 +296,13 @@ var SessionsView = Backbone.View.extend({
 	changed: function() {
 		this.trigger('change');
 	},
+
 	deleted: function() {
 		this.render(this.gameID);
 		this.trigger('delete');
 		this.trigger('change');
 	},
+
 	duplicate: function(item){
 		//this.collection.add(new Session({players: new Players({item.players.toJSON()})}));
 		var session = item.toJSON();
@@ -589,16 +591,20 @@ var PlayersView = Backbone.View.extend({
 	},
 
 	deleteLastRecord: function() {
+		console.log('deleting')
 		var master = this;
 		//determining what is the last timestamp
 		var allLabels = [];
 		_.each(_.pluck(this.model.get('players').toJSON(),'timestamps'), function(item){
 			allLabels = _.union(allLabels, item)
-		}).sort()
-		var lastTimestamp = allLabels[allLabels.length - 1]
+		})
 
+		var lastTimestamp = allLabels.sort()[allLabels.length - 1]
+		console.log(allLabels)
+		console.log(lastTimestamp)
 		//delete the record for that Last timestamp
-		this.model.get('players').each(function(item, idx){
+		this.model.get('players').each(function(item, idx) {
+			console.log(item)
 			var timestamps = item.get('timestamps');
 			var score = item.get('score');
 			if (timestamps[timestamps.length - 1] == lastTimestamp) {
@@ -643,7 +649,13 @@ var PlayersView = Backbone.View.extend({
 	},
 
 	displayChart: function(){
-		Chart.defaults.global.responsive = false;
+		try {
+			appScore.app.chart.clear();
+			console.log('chart cleareddd')
+		} catch(err){
+			console.log('no chart')
+		}
+		//Chart.defaults.global.responsive = false;
 		var master = this;
 		var allLabels = [];
 		_.each(_.pluck(master.model.get('players').toJSON(),'timestamps'), function(item){
@@ -687,9 +699,13 @@ var PlayersView = Backbone.View.extend({
 	    var buyers = $('#buyers').get(0).getContext('2d');
 	    buyers.canvas.width = $(window).width();
 		buyers.canvas.height = 1 * $(window).width();
-    	var chaarrt = new Chart(buyers).Line(buyerData, {responsive: false, bezierCurve: false, animation: false});
+		console.log(appScore.app.chart)
+		if (appScore.app.chart){
+			appScore.app.chart.clear();
+			console.log('chart cleared')
+		}
+    	appScore.app.chart = new Chart(buyers).Line(buyerData, {responsive: false, bezierCurve: false, animation: false});
 	},
-	
 
 	addPlayer: function() {	
 		var master = this;
