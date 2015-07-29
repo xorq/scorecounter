@@ -256,8 +256,10 @@ var GamesView = Backbone.View.extend({
 		})
 		.on('touchmove', function(e) {
 			var change = e.originalEvent.targetTouches[0].pageX - x
-			change = Math.min(Math.max(-100, change), 100) // restrict to -100px left, 0px right
-			e.currentTarget.style.left = change + 'px'
+			change = Math.min(Math.max(-150, change), 150) // restrict to -100px left, 0px right
+			if (Math.abs(change) > 50) {
+				e.currentTarget.style.left = -(change > 0 ? 1 : -1) * 50 + change + 'px'
+			}
 			 // disable scroll once we hit 10px horizontal slide
 		})
 		.on('touchend', function(e) {
@@ -388,8 +390,10 @@ var SessionsView = Backbone.View.extend({
 		})
 		.on('touchmove', function(e) {
 			var change = (e.originalEvent.targetTouches[0].pageX - x)
-			change = Math.min(Math.max(-100, change), 100) // restrict to -100px left, 0px right
-			e.currentTarget.style.left = change + 'px'
+			change = Math.min(Math.max(-150, change), 150) // restrict to -100px left, 0px right
+			if (Math.abs(change) > 50) {
+				e.currentTarget.style.left = -(change > 0 ? 1 : -1) * 50 + change + 'px'
+			}
 			// disable scroll once we hit 10px horizontal slide
 		})
 		.on('touchend', function(e) {

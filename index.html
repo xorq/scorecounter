@@ -51,16 +51,16 @@
 			<div id="popup-position"></div>
 			<div id="games" class="games" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
-					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-home ui-btn-icon-notext' data-role='button' role='button' style='display:none'></a>
-					<a href='#gameseditor' class='btn-edit-game ui-btn-right ui-btn ui-icon-edit ui-btn-icon-notext' data-role='button' role='button' style='padding:0px; display:none'></a>
-					<h4 class='app-name' style='margin:0px;font-size:22px; text-align:center'> ScoreKeeper </h4>
+					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-bars ui-btn-icon-notext' data-role='button' style='padding:10px' role='button' style='display:block'></a>
+					<a href='#sessionseditor?' id='session-editor' class='btn-add-session btn-add-game ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:block'></a>
+					<h4 class='app-name' style='margin-left:60px;margin-right:60px;font-size:22px; text-align:center'> ScoreKeeper </h4>
 				</div>
 
 				<div class="games">
 					
 
 				</div>
-				<a class='ui-btn btn-add-game' style='color:green'>- New Game -</a>
+				<!--<a class='ui-btn btn-add-game' style='color:green'>- New Game -</a>-->
 			</div>
 			
 		</div>
@@ -70,7 +70,7 @@
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
 					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-back ui-btn-icon-notext' data-role='button' role='button' style='top:2px;padding:10px'></a>
 					<a href='' class='btn-session-function ui-btn-right ui-btn' data-role='button' role='button' style='padding:10px;top:8px'></a>
-					<h4 class='session-title' style='margin-left:60px;margin-right:0px;font-size:20px; text-align:center'></h4>
+					<h4 class='session-title' style='margin-left:70px;margin-right:70px;font-size:20px; text-align:center'></h4>
 				</div>
 				<div class="players"></div>
 				<a data-role='button' class='btn-add-player ui-btn' style='color:green'>- Add Player -</a>
@@ -84,11 +84,10 @@
 			<div id="sessions" class="sessions" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
 					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-home ui-btn-icon-notext' data-role='button' style='padding:10px' role='button' style='display:block'></a>
-					<a href='#sessionseditor?' id='session-editor' class='btn-edit-game ui-btn-right ui-btn ui-icon-edit ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:none'></a>
-					<h4 class='title' style='margin-left:60px;margin-right:0px;font-size:22px; text-align:center'></h4>
+					<a href='#sessionseditor?' id='session-editor' class='btn-add-session btn-edit-game ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:block'></a>
+					<h4 class='title' style='margin-left:60px;margin-right:60px;font-size:22px; text-align:center'></h4>
 				</div>
 				<div class="sessions"></div>
-				<a data-role='button' class='btn-add-session ui-btn' style='color:green'>- Add Session -</a>
 			</div>
 		</div>
 
