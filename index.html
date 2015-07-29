@@ -36,16 +36,19 @@
 
 </div><!-- /page -->
 	<body>
-		<div class='background'></div>
-		<div class='dialog'>
-			<div class="modalLink" id="modalSuccessTrigger" href="#popupSuccess" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" data-icon="delete" data-theme="b">
-			<h5>Name?<h5>
-			<input type="text" class='game-name' style="color:white;background:black"></input>
-			<a data-role='button' class='ui-btn btn-ok' style='color:green'>Ok</a>
-			<a data-role='button' class='ui-btn btn-cancel' style='color:green'>Cancel</a>
+		<div class='background' id='background'></div>
+
+			<div class="modalLink" id="modalSuccessTrigger" href="#popupSuccess" data-rel="popup" data-position="fixed" data-transition="pop" data-icon="delete" data-theme="b">
+				<h5>Name?</h5>
+				<input type="text" class='game-name' style="color:white;background:black"></input>
+				<div data-inline='true'>
+				<a data-role='button' class='ui-btn btn-ok' data-inline='true' style='color:green'>Ok</a>
+				<a data-role='button' class='ui-btn btn-cancel' data-inline='true' style='color:green'>Cancel</a>
+				</div>
 			</div>
-		</div>
+		
 		<div id="games" data-role="page" data-theme="b">
+			<div id="popup-position"></div>
 			<div id="games" class="games" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
 					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-home ui-btn-icon-notext' data-role='button' role='button' style='display:none'></a>

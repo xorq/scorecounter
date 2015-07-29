@@ -189,7 +189,7 @@ var GamesView = Backbone.View.extend({
 		e.preventDefault();
 		var modalLink = $('.modalLink');
 		var pop = modalLink.popup();
-		pop.popup('open');
+		pop.popup('open', {positionTo: '#popup-position'});
 		modalLink.one({
 			popupafterclose: function(event, ui) { 
 				modalLink.popup('destroy'); 
@@ -705,7 +705,7 @@ var PlayersView = Backbone.View.extend({
 			allLabels = _.union(allLabels, item)
 		})
 		allLabels.sort()	
-
+		
 		var results = _.map(master.model.get('players').toJSON(), function(label, i){
 			var modifiedIncrements = _.map(allLabels, function(label, ind){
 				var index = _.indexOf(_.pluck(master.model.get('players').toJSON(),'timestamps')[i], label);
