@@ -180,14 +180,11 @@ var GamesView = Backbone.View.extend({
 		$('.game-name').val()
 	},
 
-	cancel: function() {
-
-	},
-
 	addGame: function(e) {
 		var master = this;
 		e.preventDefault();
 		var modalLink = $('.modalLink');
+		$('.modalLink').css('display', 'block')
 		var pop = modalLink.popup();
 		pop.popup('open', {positionTo: '#popup-position'});
 		modalLink.one({
@@ -196,17 +193,25 @@ var GamesView = Backbone.View.extend({
 			}
 		});
 		$('.game-name').focus();
+		
+		$('.game-name').keyup(function(event){
+		    if(event.keyCode == 13){
+		        $('.btn-ok').click();
+		    }
+		});
+
 		$('.btn-ok').one('click', function() {
 			modalLink.popup('close')
 			master.createGame($('.game-name').val());
 			$('.game-name').val('');
 			$('.btn-cancel').off('click')
+			$('.modalLink').css('display', 'none')
 		})
 		$('.btn-cancel').one('click', function() {
 			modalLink.popup('close')
 			$('.game-name').val('');
 			$('.btn-ok').off('click')
-
+			$('.modalLink').css('display', 'none')
 		})
 	},
 
@@ -705,7 +710,7 @@ var PlayersView = Backbone.View.extend({
 			allLabels = _.union(allLabels, item)
 		})
 		allLabels.sort()	
-		
+
 		var results = _.map(master.model.get('players').toJSON(), function(label, i){
 			var modifiedIncrements = _.map(allLabels, function(label, ind){
 				var index = _.indexOf(_.pluck(master.model.get('players').toJSON(),'timestamps')[i], label);
@@ -734,14 +739,13 @@ var PlayersView = Backbone.View.extend({
 				data : result
 			}
 		})
-
 		var buyerData = {
 			labels :  allFormattedLabels,//["January","February","March","April","May","June"],
 			datasets : dataset
 		}
 	    var buyers = $('#buyers').get(0).getContext('2d');
 	    buyers.canvas.width = $(window).width();
-		buyers.canvas.height = 1 * $(window).width();
+		buyers.canvas.height = $(window).width();
 		if (appScore.app.chart){
 			_.each(appScore.app.chart, function(item, id){
 				console.log('chart cleared number ' + item.id)
@@ -938,8 +942,7 @@ appScore.router = new $.mobile.Router(
 	{
 		"#games": { handler: "games", events: "bs"},	
 		"#sessions[?](\\d+)": { handler: "sessions", events: "bs"},
-		"#session[?](\\d+)[?](\\d+)": { handler: "session", events: "bs"},
-		//"#dialog": { handler: "dialog", events: "bs"},			
+		"#session[?](\\d+)[?](\\d+)": { handler: "session", events: "bs"},			
 	},
 	appScore.app
 );
