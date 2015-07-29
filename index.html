@@ -37,7 +37,14 @@
 </div><!-- /page -->
 	<body>
 		<div class='background'></div>
-	
+		<div class='dialog'>
+			<div class="modalLink" id="modalSuccessTrigger" href="#popupSuccess" data-rel="popup" data-position-to="window" data-role="button" data-inline="true" data-transition="pop" data-icon="delete" data-theme="b">
+			<h5>Name?<h5>
+			<input type="text" class='game-name' style="color:white;background:black"></input>
+			<a data-role='button' class='ui-btn btn-ok' style='color:green'>Ok</a>
+			<a data-role='button' class='ui-btn btn-cancel' style='color:green'>Cancel</a>
+			</div>
+		</div>
 		<div id="games" data-role="page" data-theme="b">
 			<div id="games" class="games" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
@@ -45,13 +52,16 @@
 					<a href='#gameseditor' class='btn-edit-game ui-btn-right ui-btn ui-icon-edit ui-btn-icon-notext' data-role='button' role='button' style='padding:0px; display:none'></a>
 					<h4 class='app-name' style='margin:0px;font-size:22px; text-align:center'> ScoreKeeper </h4>
 				</div>
-				<div class="games"></div>
-				<div>
-				<a data-role='button' class='btn-add-game ui-btn' style='color:green'>- New Game -</a>
-				</div>
-			</div>
-		</div>
 
+				<div class="games">
+					
+
+				</div>
+				<a class='ui-btn btn-add-game' style='color:green'>- New Game -</a>
+			</div>
+			
+		</div>
+		
 		<div id='session' data-role='page' class="ui-page-theme-b">
 			<div id="players" class="players" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
@@ -75,12 +85,9 @@
 					<h4 class='title' style='margin-left:60px;margin-right:0px;font-size:22px; text-align:center'></h4>
 				</div>
 				<div class="sessions"></div>
-				<div>
-				<a data-role='button' class='btn-add-session ui-btn' style='color:green'>- New session -</a>
-				</div>
+				<a data-role='button' class='btn-add-session ui-btn' style='color:green'>- Add Session -</a>
 			</div>
 		</div>
-
 
 		<div data-role="page" data-theme="b" id="title" data-title="Score Keeper">
 			<div class="app" style="width:100%" data-role="page" data-theme="b" id="scripts">

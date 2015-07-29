@@ -166,12 +166,48 @@ var Games = Backbone.Collection.extend({
 
 /*Views --------------------------------  */
 
-
 var GamesView = Backbone.View.extend({
 	el: $('.games'),
 	events: {
 		'click .btn-add-game': 'addGame',
+		'click .btn-ok' : 'saveNewName'
+
 		//'click .btn-edit-game': 'editGame'
+	},
+
+	saveNewName: function() {
+		console.log($('.game-name').val())
+		$('.game-name').val()
+	},
+
+	cancel: function() {
+
+	},
+
+	addGame: function(e) {
+		var master = this;
+		e.preventDefault();
+		var modalLink = $('.modalLink');
+		var pop = modalLink.popup();
+		pop.popup('open');
+		modalLink.one({
+			popupafterclose: function(event, ui) { 
+				modalLink.popup('destroy'); 
+			}
+		});
+		$('.game-name').focus();
+		$('.btn-ok').one('click', function() {
+			modalLink.popup('close')
+			master.createGame($('.game-name').val());
+			$('.game-name').val('');
+			$('.btn-cancel').off('click')
+		})
+		$('.btn-cancel').one('click', function() {
+			modalLink.popup('close')
+			$('.game-name').val('');
+			$('.btn-ok').off('click')
+
+		})
 	},
 
 	initialize: function() {
@@ -196,6 +232,7 @@ var GamesView = Backbone.View.extend({
 	render: function() {
 		var master = this;
 		var gamesHolder = $('.games', this.$el);
+
 		gamesHolder.empty();
 		this.collection.each(function(item, id) {
 			var gameView = (new GameView({model: item}))
@@ -204,7 +241,6 @@ var GamesView = Backbone.View.extend({
 			master.listenTo(gameView, 'delete', master.deleted);
 			gamesHolder.enhanceWithin();
 		})
-
 		//Swip functions
 		$('.games').css('display','block');
 			$('.ui-listview li > a')
@@ -234,11 +270,15 @@ var GamesView = Backbone.View.extend({
 			
 		});
 	},
-	addGame: function() {
-		var gameName = window.prompt('Name?');
+	createGame: function(gameName) {
+		if (!gameName) {
+			var gameName = window.prompt('Name?');
+		}
+
 		if (!gameName) {
 			return
 		}
+
 		var alreadyExists = _.filter(this.collection.models, function(item) { return item.attributes.name == gameName }).length > 0;
 		if (alreadyExists) {
 			window.alert('This game already exists')
@@ -650,7 +690,10 @@ var PlayersView = Backbone.View.extend({
 
 	displayChart: function(){
 		try {
-			appScore.app.chart.clear();
+			_.each(appScore.app.chart, function(item, id){
+				console.log('cleared ' + item.id)
+				item.clear()
+			})
 			console.log('chart cleareddd')
 		} catch(err){
 			console.log('no chart')
@@ -699,12 +742,16 @@ var PlayersView = Backbone.View.extend({
 	    var buyers = $('#buyers').get(0).getContext('2d');
 	    buyers.canvas.width = $(window).width();
 		buyers.canvas.height = 1 * $(window).width();
-		console.log(appScore.app.chart)
 		if (appScore.app.chart){
-			appScore.app.chart.clear();
-			console.log('chart cleared')
+			_.each(appScore.app.chart, function(item, id){
+				console.log('chart cleared number ' + item.id)
+				item.clear();
+				item.destroy();	
+			})
+			appScore.app.chart = [];
 		}
-    	appScore.app.chart = new Chart(buyers).Line(buyerData, {responsive: false, bezierCurve: false, animation: false});
+    	appScore.app.chart.push(new Chart(buyers).Line(buyerData, {responsive: false, bezierCurve: false, animation: false}));
+		console.log('chart number ' + appScore.app.chart.id)
 	},
 
 	addPlayer: function() {	
@@ -742,7 +789,7 @@ var PlayerView = Backbone.View.extend({
 	},
 
 	vibrate: function() {
-		navigator.vibrate(100)
+		navigator.vibrate(200)
 	},
 
 	render: function() {
@@ -795,6 +842,8 @@ var appScore = {};
 appScore.app = {
 	activeViews: [],
 	timer: 0,
+	chart: [],
+	pop: [],
 	gamesCollection: (new Games()),
 
 	// Application Constructor
@@ -819,6 +868,7 @@ appScore.app = {
 	},
 
 	games: function(event, args) {
+		console.log(appScore.app.activeViews)
 		this.undelegateAll();
 		this.bindEvents();
 
@@ -886,9 +936,10 @@ appScore.app = {
 
 appScore.router = new $.mobile.Router(
 	{
-		"#games": { handler: "games", events: "bs"},		
+		"#games": { handler: "games", events: "bs"},	
 		"#sessions[?](\\d+)": { handler: "sessions", events: "bs"},
 		"#session[?](\\d+)[?](\\d+)": { handler: "session", events: "bs"},
+		//"#dialog": { handler: "dialog", events: "bs"},			
 	},
 	appScore.app
 );
