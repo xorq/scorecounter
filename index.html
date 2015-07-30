@@ -93,14 +93,6 @@
 
 		<div data-role="page" data-theme="b" id="title" data-title="Score Keeper">
 			<div class="app" style="width:100%" data-role="page" data-theme="b" id="scripts">
-				<script type='text/template' id='timerTemplate'>
-					<!--<a data-role='' class='clock' style='display:block'></a>-->
-					<a data-role='button' class='btn-start-session ui-btn' style='color:green;display:<%=startTime && "none"%>'>- Start Session -</a>
-					<a data-role='button' class='btn-finish-session ui-btn' style='color:green;display:<%=(!finishTime && startTime) ? "block" : "none"%>'>- Finish Session -</a>
-					<a data-role='button' class='btn-pause-timer ui-btn' style='color:green;display:<%=(!finishTime && startTime && !paused) ? "block" : "none"%>'>- Pause Timer -</a>
-					<a data-role='button' class='btn-continue-timer ui-btn' style='color:green;display:<%=(!finishTime && startTime && paused) ? "block" : "none"%>'>- Continue -</a>
-					<a data-role='button' class='btn-reset-timer ui-btn' style='color:green;display:<%=(finishTime==0) || (startTime==0 && !(finishTime==0)) ? "none" : "block"%>'>- Reset Timer -</a>
-				</script>
 
 				<script type='text/template' id='gameTemplate'>
 					<ul class="ui-listview" data-role="listview" data-type="horizontal">
@@ -129,9 +121,9 @@
 				<script type='text/template' id='playerTemplate'>
 					<div class="ui-grid-a" style='height:50px'>
 						<div class='ui-block-b' style='width:33%;height: 100%;'>
-							<input type="text" class='player-name' style="color:white;background:black" value='<%=name%>'></input>
+							<input type="text" class='player-name' style="color:<%=color%>;background:black" value='<%=name%>'></input>
 						</div>
-						<div class="ui-block-c" style='font-size:100%;text-align:center;height: 100%;width:18%'>
+						<div class="ui-block-c" style='font-size:100%;color:<%=color%>;text-align:center;height: 100%;width:18%'>
 							<text class='score' style=''><%=_.reduce(score, function(memo, num){ return memo + num; }, 0)%></text>
 						</div>
 						<div class="ui-block-d" style='width:17%;height:100%'>
