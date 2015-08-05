@@ -1,4 +1,49 @@
-LISTOFCOLORS = ['white', 'red', 'pink', 'orange', 'green', 'yellow', 'blue'];
+var LISTOFCOLORS = ['white', 'red', 'pink', 'orange', 'green', 'yellow', 'blue'];
+
+var dialog = function(title, input, holder, buttons, callbacks){
+	console.log(holder)
+	holder.html('')
+	buttonsHTML = _.map(buttons, function(item, id) {
+		console.log($('.' + item))
+		return "<a data-role='button' class='" + item + " ui-btn btn-ok' data-inline='true' style='color:default'>" + item + "</a>"
+	}).join('')
+
+	holder.append("\
+		<div class='export-tool' id='modalSuccessTrigger' href='#popupSuccess' data-rel='popup' data-position='fixed' data-transition='pop' data-icon='delete' data-theme='b' style='display:none'>\
+			<h5>What to do ?</h5>\
+			" + (input ? "<input type='text' class='inputBox' style='color:white;background:black'></input>" : "" ) + "\
+			<div data-inline='true'>\
+				" + buttonsHTML + 
+			"</div>\
+		</div>")
+	_.each(buttons, function(item, id) {
+		$('.' + item).one('click', function(){
+			callbacks[id]($('.inputBox').val() || undefined);
+			modalLink.popup('close')
+			$('.inputBox').val('');
+			$('.btn-ok').off('click')
+			$('.modalLink').css('display', 'none')
+		})
+	})
+
+	var modalLink = $('.export-tool');
+	$('.export-tool').css('display', 'block')
+	var pop = modalLink.popup();
+	pop.popup('open', {positionTo: '#popup-position'});
+	modalLink.one({
+		popupafterclose: function(event, ui) { 
+			modalLink.popup('destroy'); 
+		}
+
+	})
+	$('.inputBox').focus();;
+	
+};
+
+
+
+
+
 
 function formatDate(d) { 
   var d = parseInt(d)
@@ -172,8 +217,8 @@ var GamesView = Backbone.View.extend({
 	el: $('.games'),
 	events: {
 		'click .btn-add-game': 'addGame',
-		'click .btn-ok' : 'saveNewName'
-
+		//'click .btn-ok' : 'saveNewName',
+		'click .btn-tools': 'tools'
 		//'click .btn-edit-game': 'editGame'
 	},
 
@@ -195,24 +240,25 @@ var GamesView = Backbone.View.extend({
 			}
 		});
 		$('.game-name').focus();
-		
-		$('.game-name').keyup(function(event){
-		    if(event.keyCode == 13){
-		        $('.btn-ok').click();
-		    }
-		});
-		
+
 		$('.btn-ok').one('click', function() {
-			modalLink.popup('close')
 			var newGameID = master.createGame($('.game-name').val());
+			modalLink.popup('close')
 			$('.game-name').val('');
 			$('.btn-cancel').off('click')
 			$('.modalLink').css('display', 'none')
 			var goToGame = function() {
 				window.location.href = '#sessions?' + newGameID;
 			}
-			setTimeout(goToGame, 0)
+			setTimeout(goToGame, 100)
 		})
+
+		/*$('.game-name').keyup(function(event){
+		    if(event.keyCode == 13){
+				gameCreation()
+		    }
+		});*/
+
 		$('.btn-cancel').one('click', function() {
 			modalLink.popup('close')
 			$('.game-name').val('');
@@ -285,6 +331,7 @@ var GamesView = Backbone.View.extend({
 		});
 	},
 	createGame: function(gameName) {
+		console.log(gameName)
 		if (!gameName) {
 			var gameName = window.prompt('Name?');
 		}
@@ -296,13 +343,42 @@ var GamesView = Backbone.View.extend({
 		var alreadyExists = _.filter(this.collection.models, function(item) { return item.attributes.name == gameName }).length > 0;
 		if (alreadyExists) {
 			window.alert('This game already exists')
-			return
+				return
+			}
+			var newGameID =  Number(new Date);
+			this.collection.add(new Game({id: newGameID, name: gameName}));
+			//this.trigger('change');
+			//this.render();
+			return newGameID;
+	},
+
+	tools: function(e) {
+		var master = this;
+		var backup = function(input){
+			console.log('backup ' + input)
+			var a = new DirManager(); // Initialize a Folder manager
+			a.create_r('scorekeeper',Log('created successfully'));
+			var b = new FileManager();
+			b.write_file('scorekeeper', 'backup.txt', localStorage.getItem('games') ,Log('wrote sucessful!'));
+		};
+		
+		var restore = function(input){
+			console.log('restoring')
+			var b = new FileManager();
+			
+			b.read_file('scorekeeper','backup.txt', function(r) {
+				console.log(r);
+				localStorage.setItem('games', r)
+				console.log(Games);
+				//master.initialize();
+				window.location.reload();
+			}
+			,Log('something went wrong'));
+
+//b.read_file('scorekeeper','backup.txt',function(r){console.log(r)},Log('wrote sucessful!'));
 		}
-		var newGameID =  Number(new Date);
-		this.collection.add(new Game({id: newGameID, name: gameName}));
-		//this.trigger('change');
-		//this.render();
-		return newGameID;
+
+		dialog('what to do?', false, $('.dialog-holder'), ['backup', 'restore'], [backup, restore])
 	}
 });
 
@@ -390,7 +466,7 @@ var SessionsView = Backbone.View.extend({
 	el: $('.sessions'),
 	events: {
 		'click .btn-add-session': 'addSession',
-		'click .btn-add-game': 'addSession'
+		//'click .btn-add-game': 'addSession'
 	},
 	//template: _.template($('#sessionsTemplate').text()),
 
@@ -1019,15 +1095,17 @@ appScore.app = {
 		/*$(".myMenu ul li a").on("touchend", function(event) {
   window.location.href = $(this).attr("href");
 });*/
-		FastClick.attach(document.body);
-		app.receivedEvent('deviceready');
+		
+		//FastClick.attach(document.body);
+		appScore.app.receivedEvent('deviceready');
+
 	},
 	// Update DOM on a Received Event
 	receivedEvent: function(id) {
-		var parentElement = document.getElementById(id);
+		/*var parentElement = document.getElementById(id);
 		var listeningElement = parentElement.querySelector('.listening');
 		var receivedElement = parentElement.querySelector('.received');
-		console.log('Received Event: ' + id);
+		console.log('Received Event: ' + id);*/
 	}
 };
 

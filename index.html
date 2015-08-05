@@ -21,6 +21,7 @@
 -->
 <html>
 	<head>
+
 		<meta charset="utf-8" />
 		<meta name="format-detection" content="telephone=no" />
 		<meta name="msapplication-tap-highlight" content="no" />
@@ -30,6 +31,7 @@
 		<link rel="stylesheet" href="bower_components/jquery-mobile/css/themes/default/jquery.mobile.css" />
 		<link rel="stylesheet" type="text/css" href="css/index.css" />
 		<title>Score Keeper</title>
+		<meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'">
 	</head>
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -37,7 +39,7 @@
 </div><!-- /page --><div class='background'></div>
 	<body style='color:black'>
 		<div style='color:black' class='background' id='background'></div>
-		
+			<div class="dialog-holder"></div>
 			<div class="modalLink" id="modalSuccessTrigger" href="#popupSuccess" data-rel="popup" data-position="fixed" data-transition="pop" data-icon="delete" data-theme="b" style="display:none">
 				<h5>Game Name</h5>
 				<input type="text" class='game-name' style="color:white;background:black"></input>
@@ -46,13 +48,22 @@
 				<a data-role='button' class='ui-btn btn-cancel' data-inline='true' style='color:default'>Cancel</a>
 				</div>
 			</div>
+
+			<div class="export-tool" id="modalSuccessTrigger" href="#popupSuccess" data-rel="popup" data-position="fixed" data-transition="pop" data-icon="delete" data-theme="b" style="display:none">
+				<h5>What to do ?</h5>
+				<input type="text" class='input-field' style="color:white;background:black"></input>
+				<div data-inline='true'>
+				<a data-role='button' class='ui-btn btn-ok' data-inline='true' style='color:default'>Backup</a>
+				<a data-role='button' class='ui-btn btn-cancel' data-inline='true' style='color:default'>Restore</a>
+				</div>
+			</div>
 		
 		<div id="games" data-role="page" data-theme="b">
 			<div id="popup-position"></div>
 			<div id="games" class="games" data-role="page" data-theme="b">
 				<div data-role='header' role='banner' class='ui-header ui-bar-inherit'>
-					<a href='#games' data-transition='slide' data-direction='reverse' class='btn-back ui-btn-left ui-btn ui-icon-bars ui-btn-icon-notext' data-role='button' style='padding:10px' role='button' style='display:block'></a>
-					<a href='#sessionseditor?' id='session-editor' class='btn-add-session btn-add-game ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:block'></a>
+					<a class='btn-tools ui-btn ui-icon-bars ui-btn-icon-notext' data-role='button' style='padding:10px' role='button' style='display:block'></a>
+					<a href='#sessionseditor?' id='session-editor' class='btn-add-game ui-btn-right ui-btn ui-icon-plus ui-btn-icon-notext' data-role='button' role='button' style='padding:10px;display:block'></a>
 					<h4 class='app-name' style='margin-left:60px;margin-right:60px;font-size:22px; text-align:center'> ScoreKeeper </h4>
 				</div>
 
@@ -148,7 +159,11 @@
 		<script type='text/javascript' src='bower_components/backbone/backbone.js'></script>
 		<script type="text/javascript" src='bower_components/Chart.js/Chart.js'></script>
 		<script type='text/javascript' src='bower_components/backbone.touch/backbone.touch.js'></script>
+		<!--<script type="text/javascript" src="cordova.js"></script>-->
+		<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+		<script type="text/javascript" src="js/painlessfs.js"></script>
 		<script type="text/javascript" src="js/index.js"></script>
+
 
 	</body>
 </html>
