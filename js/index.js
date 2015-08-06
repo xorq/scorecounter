@@ -23,6 +23,7 @@ var dialog = function(title, input, holder, buttons, callbacks){
 				" + buttonsHTML + 
 			"</div>\
 		</div>")
+
 	_.each(buttons, function(item, id) {
 		$('.' + item).one('click', function(){
 			callbacks[id]($('.inputBox').val() || undefined);
@@ -40,6 +41,8 @@ var dialog = function(title, input, holder, buttons, callbacks){
 	modalLink.one({
 		popupafterclose: function(event, ui) { 
 			modalLink.popup('destroy'); 
+			$('.modalLink').css('display', 'none')
+			$('.export-tool').css('display', 'none')
 		}
 
 	})
