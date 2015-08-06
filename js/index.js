@@ -1,5 +1,12 @@
 var LISTOFCOLORS = ['white', 'red', 'pink', 'orange', 'green', 'yellow', 'blue'];
 
+/*var StopWatch = function() {
+	var start = (new Date()).getTime();
+	this.elapsed = function() {
+		return (new Date()).getTime() - start;
+	}
+}*/
+
 var dialog = function(title, input, holder, buttons, callbacks){
 	console.log(holder)
 	holder.html('')
@@ -184,7 +191,7 @@ var Games = Backbone.Collection.extend({
 		this.listenTo(this, 'remove', this.sync);
 	},
 
-	load: function() {	
+	load: function() {
 		var data = $.parseJSON(localStorage.getItem('games'));
 		this.reset(_.map(data, function(item, id){
 			sessionsCollection = new Sessions(_.map(item.sessions, function(session,idx){
@@ -206,7 +213,6 @@ var Games = Backbone.Collection.extend({
 	},
 
 	sync: function() {
-		//console.log('saved to localstorage')
 		localStorage.setItem('games', JSON.stringify(this));
 	}
 });
@@ -248,7 +254,7 @@ var GamesView = Backbone.View.extend({
 			$('.btn-cancel').off('click')
 			$('.modalLink').css('display', 'none')
 			var goToGame = function() {
-				window.location.href = '#sessions?' + newGameID;
+				window.location.href = '#session?' + newGameID;
 			}
 			setTimeout(goToGame, 100)
 		})
@@ -542,9 +548,11 @@ var SessionsView = Backbone.View.extend({
 
 	},
 	addSession: function() {
-		this.collection.add(new Session({id: Number(new Date), players: new Players(new Player({id: Number(new Date)}))}));
+		var newSessionID = Number(new Date);
+		this.collection.add(new Session({id: newSessionID, players: new Players(new Player({id: Number(new Date)}))}));
 		this.trigger('change');
-		this.render(this.gameID);
+		//this.render(this.gameID);
+		window.location.href = '#session?' + this.gameID + '?' + newSessionID ;
 
 	}
 });
@@ -603,7 +611,7 @@ var PlayersView = Backbone.View.extend({
 	template: _.template($('#playersTemplate').text()),
 	
 	reOpen: function() {
-		var sure = window.confirm('sure ?');
+		var sure = window.confirm('Re Open session ?');
 		if (!sure){
 			return
 		}
@@ -624,6 +632,7 @@ var PlayersView = Backbone.View.extend({
 		this.model.set('paused', Number(new Date))
 		clearInterval(appScore.app.timer);
 		appScore.app.timer = null;
+		this.render();
 	},
 
 	continueTimer: function() {
@@ -648,10 +657,10 @@ var PlayersView = Backbone.View.extend({
 	},
 
 	finishSession: function() {
-		var finished = window.confirm('Finish Session ?');
+		/*var finished = window.confirm('Finish Session ?');
 		if (!finished){
 			return
-		}
+		}*/
 		this.model.set('finishTime', Number(new Date));
 		if (this.model.get('paused')) {
 			this.model.set('pauseTime', this.model.get('pauseTime') + Number(new Date) - this.model.get('paused'));
@@ -915,7 +924,7 @@ var PlayersView = Backbone.View.extend({
 		buyers.canvas.height = $(window).width();
 		if (appScore.app.chart){
 			_.each(appScore.app.chart, function(item, id){
-				console.log('chart cleared number ' + item.id)
+				//console.log('chart cleared number ' + item.id)
 				item.clear();
 				item.destroy();	
 			})
