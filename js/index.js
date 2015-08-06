@@ -44,7 +44,6 @@ var dialog = function(title, input, holder, buttons, callbacks){
 			$('.modalLink').css('display', 'none')
 			$('.export-tool').css('display', 'none')
 		}
-
 	})
 	$('.inputBox').focus();;
 	
@@ -364,27 +363,39 @@ var GamesView = Backbone.View.extend({
 	tools: function(e) {
 		var master = this;
 		var backup = function(input){
-			console.log('backup ' + input)
+			var confirmed = window.confirm('backup ?')
+			if (!confirmed) {
+				return
+			}
 			var a = new DirManager(); // Initialize a Folder manager
 			a.create_r('scorekeeper',Log('created successfully'));
-			var b = new FileManager();
-			b.write_file('scorekeeper', 'backup.txt', localStorage.getItem('games') ,Log('wrote sucessful!'));
+			//a.list('scorekeeper', function(arr){ 
+			//	var b = new FileManager();
+				console.log(arr.length)
+				//b.write_file('scorekeeper', 'backup' + arr.length + '.txt', localStorage.getItem('games') ,Log('wrote sucessful!'));
+				b.write_file('scorekeeper', 'backup.txt', localStorage.getItem('games') ,Log('wrote sucessful!'));
+				window.alert('backup saved in scorekeeper folder')
+			//});
+
 		};
 		
 		var restore = function(input){
-			console.log('restoring')
+			var confirmed = window.confirm('restore from backup.txt file ?')
+			if (!confirmed) {
+				return
+			}
 			var b = new FileManager();
-			
 			b.read_file('scorekeeper','backup.txt', function(r) {
 				console.log(r);
 				localStorage.setItem('games', r)
 				console.log(Games);
 				//master.initialize();
 				window.location.reload();
+				window.alert('your backup is loaded')
 			}
 			,Log('something went wrong'));
 
-//b.read_file('scorekeeper','backup.txt',function(r){console.log(r)},Log('wrote sucessful!'));
+			//b.read_file('scorekeeper','backup.txt',function(r){console.log(r)},Log('wrote sucessful!'));
 		}
 
 		dialog('what to do?', false, $('.dialog-holder'), ['backup', 'restore'], [backup, restore])
@@ -495,7 +506,7 @@ var SessionsView = Backbone.View.extend({
 		playersCollection = new Players(_.map(session.players.toJSON(), function(player, idp){
 				player.score = [];
 				player.timestamps = [];
-				return new Player({id: player.id, score: player.score, name:player.name})
+				return new Player({id: player.id, score: [0], timestamps: [session.id], name:player.name})
 			}));
 		var laSession = new Session({pauseTime: 0, paused: 0, startTime:0, finishTime:0, id: Number(new Date), players:playersCollection})
 		this.collection.add(laSession);
