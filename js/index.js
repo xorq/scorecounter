@@ -142,7 +142,7 @@ var Session = Backbone.Model.extend({
 	defaults: {
 		id: Number(new Date),
 		//timestamp: (new Date).toLocaleDateString() + ' ' + (new Date).toLocaleTimeString(),
-		players: (new Players([new Player({id: Number(new Date)})])),
+		players: (new Players([new Player({id: Number(new Date), timestamps:[], score:[]})])),
 		toDelete: false,
 		startTime: 0,
 		finishTime: 0,
@@ -581,11 +581,15 @@ var SessionsView = Backbone.View.extend({
 
 	},
 	addSession: function() {
+		var master = this;
 		var newSessionID = Number(new Date);
 		this.collection.add(new Session({id: newSessionID, players: new Players(new Player({id: Number(new Date)}))}));
 		this.trigger('change');
-		//this.render(this.gameID);
-		window.location.href = '#session?' + this.gameID + '?' + newSessionID ;
+		this.render(this.gameID);
+		var redirect = function() {
+			window.location.href = '#session?' + master.gameID + '?' + newSessionID ;
+		}
+		setTimeout(redirect, 0)
 
 	}
 });
@@ -844,6 +848,7 @@ var PlayersView = Backbone.View.extend({
 	},
 
 	render: function() {
+		var width = $(window).width();
 		var master = this;
 
 		clearInterval(appScore.app.timer);
@@ -864,10 +869,9 @@ var PlayersView = Backbone.View.extend({
 		$('.players').css('display','block');
 
 		this.showTimer();
-
-		setTimeout(_.bind(master.displayChart, master),0)
+		
 		this.drawFunctionButton();
-			if (this.getState() == 'paused') {
+		if (this.getState() == 'paused') {
 			$('.session-title').css('color','red').html($('.session-title').html() + ' (PAUSED)')
 			$('.plus').addClass('ui-disabled');
 			$('.minus').addClass('ui-disabled');
@@ -903,15 +907,18 @@ var PlayersView = Backbone.View.extend({
 			$('.player-name').addClass('ui-disabled').css('opacity','100');;
 			$('.btn-add-player').css('display', 'none');
 		}
-		
+		var buyers = $('#buyers').get(0).getContext('2d');
+
+		setTimeout(_.bind(master.displayChart, master, width),200)
 	},
 
-	displayChart: function(){
+	displayChart: function(width){
 		try {
 			_.each(appScore.app.chart, function(item, id){
 				item.clear()
 			})
 		} catch(err){
+			console.log(err)
 		}
 		//Chart.defaults.global.responsive = false;
 		var master = this;
@@ -953,8 +960,9 @@ var PlayersView = Backbone.View.extend({
 			datasets : dataset
 		}
 	    var buyers = $('#buyers').get(0).getContext('2d');
-	    buyers.canvas.width = $(window).width();
-		buyers.canvas.height = $(window).width();
+	    buyers.canvas.width = width ;//$(window).width();
+		buyers.canvas.height = width ;//$(window).width();
+		console.log(buyers.canvas.width)
 		if (appScore.app.chart){
 			_.each(appScore.app.chart, function(item, id){
 				//console.log('chart cleared number ' + item.id)
