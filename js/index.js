@@ -585,11 +585,16 @@ var SessionsView = Backbone.View.extend({
 		var newSessionID = Number(new Date);
 		this.collection.add(new Session({id: newSessionID, players: new Players(new Player({id: Number(new Date)}))}));
 		this.trigger('change');
-		this.render(this.gameID);
+		//this.render(this.gameID);
+		//console.log(this.collection)
+		appScore.app.activeViews.push(new SessionView({model: this.collection.get(1438672008536)}))
+		/*
 		var redirect = function() {
+		}*/
+		//var relocate = function() {
 			window.location.href = '#session?' + master.gameID + '?' + newSessionID ;
-		}
-		setTimeout(redirect, 0)
+			window.reload()
+		//}
 
 	}
 });
@@ -847,7 +852,7 @@ var PlayersView = Backbone.View.extend({
 		this.render();
 	},
 
-	render: function() {
+	render: function(nextStep) {
 		var width = $(window).width();
 		var master = this;
 
@@ -908,11 +913,10 @@ var PlayersView = Backbone.View.extend({
 			$('.btn-add-player').css('display', 'none');
 		}
 		var buyers = $('#buyers').get(0).getContext('2d');
-
-		setTimeout(_.bind(master.displayChart, master, width),200)
+		setTimeout(_.bind(master.displayChart, master, width, nextStep),0)
 	},
 
-	displayChart: function(width){
+	displayChart: function(width, nextStep){
 		try {
 			_.each(appScore.app.chart, function(item, id){
 				item.clear()
@@ -972,6 +976,7 @@ var PlayersView = Backbone.View.extend({
 			appScore.app.chart = [];
 		}
     	appScore.app.chart.push(new Chart(buyers).Line(buyerData, {responsive: false, bezierCurve: false, animation: false, showTooltips: false}));
+		nextStep();
 	},
 
 	addPlayer: function() {	
@@ -1124,7 +1129,6 @@ appScore.app = {
 		this.gamesCollection.load();
 		var view = new PlayersView({ model: (this.gamesCollection.get(args[1])).get('sessions').get(args[2]) });
 		this.activeViews.push( view );
-		
 		view.render(args[2]);
 		this.gamesCollection.listenTo(view, 'change', this.gamesCollection.sync)
 
