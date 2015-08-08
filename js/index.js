@@ -6,8 +6,7 @@ var reload = function(){window.location.reload();}
 		return (new Date()).getTime() - start;
 	}
 }*/
-
-var dialog = function(title, input, holder, model, buttons, callbacks){
+var dialog = function(title, input, holder, buttons, callbacks){
 	holder.html('')
 	var classNames = [];
 	var buttonsHTML = _.map(buttons, function(item, id) {
@@ -366,11 +365,9 @@ var GamesView = Backbone.View.extend({
 		var retri = this.collection.toJSON().sort(function(a, b){
 		var nameA = a.name.toLowerCase(), nameB=b.name.toLowerCase()
 		if (nameA < nameB) {//sort string ascending
-			console.log('petit')
 			return -1 
 		}
 		if (nameA > nameB) {
-			console.log('grand')
 			return 1
 		}
 		return 0
@@ -382,22 +379,22 @@ var GamesView = Backbone.View.extend({
 		var master = this;
 		var backup = function(input, that){
 			var confirmed = window.confirm('backup ?')
-			dialog('voili', false, $('dialog-holder2'), $('.export-tool'), ['hei'], [function(){}])
+			
 	     	//dialog('what to do?', false, $('.dialog-holder'), $('.export-tool'), ['backup', 'restore'], [backup, restore])
-	
+			console.log('dialogged')
 			if (!confirmed) {
 				return
 			}
 			var a = new DirManager(); // Initialize a Folder manager
 			a.create_r('scorekeeper',Log('created successfully'));
 			//a.list('scorekeeper', function(arr){ 
-			//	var b = new FileManager();
-				console.log(arr.length)
+				var b = new FileManager();
+				//console.log(arr.length)
 				//b.write_file('scorekeeper', 'backup' + arr.length + '.txt', localStorage.getItem('games') ,Log('wrote sucessful!'));
 				b.write_file('scorekeeper', 'backup.txt', localStorage.getItem('games') ,Log('wrote sucessful!'));
 				window.alert('backup saved in scorekeeper folder')
 			//});
-
+			
 		};
 		
 		var restore = function(input, that){
@@ -419,7 +416,7 @@ var GamesView = Backbone.View.extend({
 			//b.read_file('scorekeeper','backup.txt',function(r){console.log(r)},Log('wrote sucessful!'));
 		};
 
-		dialog('what to do?', false, $('.dialog-holder'), $('.export-tool'), ['backup', 'restore'], [backup, restore])
+		dialog('what to do?', false, $('.dialog-holder'), ['backup', 'restore'], [backup, restore])
 	}
 });
 
@@ -460,6 +457,7 @@ var GameView = Backbone.View.extend({
 		modalLink.one({
 			popupafterclose: function(event, ui) { 
 				modalLink.popup('destroy'); 
+
 			}
 		});
 		$('.game-name').focus();
@@ -875,7 +873,7 @@ var PlayersView = Backbone.View.extend({
 			$('.minus').addClass('ui-disabled');
 			$('.btn-remove').addClass('ui-disabled');
 			$('.btn-delete-last-record').removeClass('ui-disabled');
-			$('.player-name').addClass('ui-disabled');
+			$('.player-name').addClass('ui-disabled').css('opacity','100');
 			$('.btn-add-player').css('display', 'none');
 		} else {
 			$('.session-title').css('color','white');
@@ -886,7 +884,7 @@ var PlayersView = Backbone.View.extend({
 			$('.plus').removeClass('ui-disabled');
 			$('.minus').removeClass('ui-disabled');
 			$('.btn-delete-last-record').removeClass('ui-disabled');
-			$('.player-name').addClass('ui-disabled');
+			$('.player-name').addClass('ui-disabled').css('opacity','100');;
 			$('.btn-add-player').css('display', 'none');
 		}
 		if (this.getState() == 'not_started') {
@@ -902,7 +900,7 @@ var PlayersView = Backbone.View.extend({
 			$('.minus').addClass('ui-disabled');
 			$('.btn-remove').addClass('ui-disabled');
 			$('.btn-delete-last-record').addClass('ui-disabled');
-			$('.player-name').addClass('ui-disabled');
+			$('.player-name').addClass('ui-disabled').css('opacity','100');;
 			$('.btn-add-player').css('display', 'none');
 		}
 		
