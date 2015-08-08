@@ -1,5 +1,5 @@
 var LISTOFCOLORS = ['white', 'red', 'pink', 'orange', 'green', 'yellow', 'blue'];
-
+var reload = function(){window.location.reload();}
 /*var StopWatch = function() {
 	var start = (new Date()).getTime();
 	this.elapsed = function() {
@@ -7,46 +7,42 @@ var LISTOFCOLORS = ['white', 'red', 'pink', 'orange', 'green', 'yellow', 'blue']
 	}
 }*/
 
-var dialog = function(title, input, holder, buttons, callbacks){
-	console.log(holder)
+var dialog = function(title, input, holder, model, buttons, callbacks){
 	holder.html('')
-	buttonsHTML = _.map(buttons, function(item, id) {
-		console.log($('.' + item))
-		return "<a data-role='button' class='" + item + " ui-btn btn-ok' data-inline='true' style='color:default'>" + item + "</a>"
+	var classNames = [];
+	var buttonsHTML = _.map(buttons, function(item, id) {
+		var className = item.replace(/\s+/g, '');
+		classNames[id] = className;
+		return "<a data-role='button' class='" + className + " ui-btn btn-ok' data-inline='true' style='color:default'>" + item + "</a>"
 	}).join('')
 
 	holder.append("\
-		<div class='export-tool' id='modalSuccessTrigger' href='#popupSuccess' data-rel='popup' data-position='fixed' data-transition='pop' data-icon='delete' data-theme='b' style='display:none'>\
 			<h5>What to do ?</h5>\
 			" + (input ? "<input type='text' class='inputBox' style='color:white;background:black'></input>" : "" ) + "\
 			<div data-inline='true'>\
 				" + buttonsHTML + 
-			"</div>\
-		</div>")
-
+			"</div>")
+	holder.css('display','block');
+	var pop = holder.popup();
+	pop.popup('open', {positionTo: '#popup-position'});
+	holder.one({
+		popupafterclose: function(event, ui) { 
+			try{holder.popup('destroy'); } catch(err){}
+			$('.modalLink').css('display', 'none')
+			$('.export-tool').css('display', 'none')
+			holder.css('display','none')
+		}
+	})
 	_.each(buttons, function(item, id) {
-		$('.' + item).one('click', function(){
+		$('.' + classNames[id]).one('click', function(){
 			callbacks[id]($('.inputBox').val() || undefined);
-			modalLink.popup('close')
+			holder.popup('close')
 			$('.inputBox').val('');
 			$('.btn-ok').off('click')
 			$('.modalLink').css('display', 'none')
 		})
 	})
-
-	var modalLink = $('.export-tool');
-	$('.export-tool').css('display', 'block')
-	var pop = modalLink.popup();
-	pop.popup('open', {positionTo: '#popup-position'});
-	modalLink.one({
-		popupafterclose: function(event, ui) { 
-			modalLink.popup('destroy'); 
-			$('.modalLink').css('display', 'none')
-			$('.export-tool').css('display', 'none')
-		}
-	})
-	$('.inputBox').focus();;
-	
+	$('.inputBox').focus();
 };
 
 
@@ -256,7 +252,8 @@ var GamesView = Backbone.View.extend({
 			$('.btn-cancel').off('click')
 			$('.modalLink').css('display', 'none')
 			var goToGame = function() {
-				window.location.href = '#session?' + newGameID;
+				master.sortNames();
+				window.location.href = '#sessions?' + newGameID;
 			}
 			setTimeout(goToGame, 100)
 		})
@@ -277,6 +274,7 @@ var GamesView = Backbone.View.extend({
 	},
 
 	initialize: function() {
+		console.log('init')
 		this.collection.load()
 		if (!this.collection.length) {
 			this.collection.add(new Game()) 
@@ -296,6 +294,7 @@ var GamesView = Backbone.View.extend({
 	},
 
 	render: function() {
+		this.sortNames();
 		var master = this;
 		var gamesHolder = $('.games', this.$el);
 
@@ -338,6 +337,7 @@ var GamesView = Backbone.View.extend({
 			
 		});
 	},
+
 	createGame: function(gameName) {
 		console.log(gameName)
 		if (!gameName) {
@@ -360,10 +360,31 @@ var GamesView = Backbone.View.extend({
 			return newGameID;
 	},
 
+	sortNames: function(){
+		var master = this;
+		console.log(this.collection.toJSON())
+		var retri = this.collection.toJSON().sort(function(a, b){
+		var nameA = a.name.toLowerCase(), nameB=b.name.toLowerCase()
+		if (nameA < nameB) {//sort string ascending
+			console.log('petit')
+			return -1 
+		}
+		if (nameA > nameB) {
+			console.log('grand')
+			return 1
+		}
+		return 0
+	})
+		localStorage.setItem('games',JSON.stringify(retri));
+	},
+
 	tools: function(e) {
 		var master = this;
-		var backup = function(input){
+		var backup = function(input, that){
 			var confirmed = window.confirm('backup ?')
+			dialog('voili', false, $('dialog-holder2'), $('.export-tool'), ['hei'], [function(){}])
+	     	//dialog('what to do?', false, $('.dialog-holder'), $('.export-tool'), ['backup', 'restore'], [backup, restore])
+	
 			if (!confirmed) {
 				return
 			}
@@ -379,7 +400,7 @@ var GamesView = Backbone.View.extend({
 
 		};
 		
-		var restore = function(input){
+		var restore = function(input, that){
 			var confirmed = window.confirm('restore from backup.txt file ?')
 			if (!confirmed) {
 				return
@@ -396,9 +417,9 @@ var GamesView = Backbone.View.extend({
 			,Log('something went wrong'));
 
 			//b.read_file('scorekeeper','backup.txt',function(r){console.log(r)},Log('wrote sucessful!'));
-		}
+		};
 
-		dialog('what to do?', false, $('.dialog-holder'), ['backup', 'restore'], [backup, restore])
+		dialog('what to do?', false, $('.dialog-holder'), $('.export-tool'), ['backup', 'restore'], [backup, restore])
 	}
 });
 
