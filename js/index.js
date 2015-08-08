@@ -966,7 +966,6 @@ var PlayersView = Backbone.View.extend({
 	    var buyers = $('#buyers').get(0).getContext('2d');
 	    buyers.canvas.width = width ;//$(window).width();
 		buyers.canvas.height = width ;//$(window).width();
-		console.log(buyers.canvas.width)
 		if (appScore.app.chart){
 			_.each(appScore.app.chart, function(item, id){
 				//console.log('chart cleared number ' + item.id)
@@ -976,7 +975,6 @@ var PlayersView = Backbone.View.extend({
 			appScore.app.chart = [];
 		}
     	appScore.app.chart.push(new Chart(buyers).Line(buyerData, {responsive: false, bezierCurve: false, animation: false, showTooltips: false}));
-		nextStep();
 	},
 
 	addPlayer: function() {	
