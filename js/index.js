@@ -6,7 +6,8 @@ var reload = function(){window.location.reload();}
 		return (new Date()).getTime() - start;
 	}
 }*/
-var dialog = function(title, input, holder, buttons, callbacks){
+var dialog = function(title, input, holder, buttons, callbacks, afterClose){
+	var action = '';
 	holder.html('')
 	var classNames = [];
 	var buttonsHTML = _.map(buttons, function(item, id) {
@@ -16,7 +17,7 @@ var dialog = function(title, input, holder, buttons, callbacks){
 	}).join('')
 
 	holder.append("\
-			<h5>What to do ?</h5>\
+			<h5>" + title + "</h5>\
 			" + (input ? "<input type='text' class='inputBox' style='color:white;background:black'></input>" : "" ) + "\
 			<div data-inline='true'>\
 				" + buttonsHTML + 
@@ -30,6 +31,7 @@ var dialog = function(title, input, holder, buttons, callbacks){
 			$('.modalLink').css('display', 'none')
 			$('.export-tool').css('display', 'none')
 			holder.css('display','none')
+			afterClose(action);
 		}
 	})
 	_.each(buttons, function(item, id) {
@@ -39,6 +41,7 @@ var dialog = function(title, input, holder, buttons, callbacks){
 			$('.inputBox').val('');
 			$('.btn-ok').off('click')
 			$('.modalLink').css('display', 'none')
+			action = classNames[id];
 		})
 	})
 	$('.inputBox').focus();
@@ -220,9 +223,7 @@ var GamesView = Backbone.View.extend({
 	el: $('.games'),
 	events: {
 		'click .btn-add-game': 'addGame',
-		//'click .btn-ok' : 'saveNewName',
 		'click .btn-tools': 'tools'
-		//'click .btn-edit-game': 'editGame'
 	},
 
 	saveNewName: function() {
@@ -256,12 +257,6 @@ var GamesView = Backbone.View.extend({
 			}
 			setTimeout(goToGame, 100)
 		})
-
-		/*$('.game-name').keyup(function(event){
-		    if(event.keyCode == 13){
-				gameCreation()
-		    }
-		});*/
 
 		$('.btn-cancel').one('click', function() {
 			modalLink.popup('close')
@@ -354,8 +349,6 @@ var GamesView = Backbone.View.extend({
 			}
 			var newGameID =  Number(new Date);
 			this.collection.add(new Game({id: newGameID, name: gameName}));
-			//this.trigger('change');
-			//this.render();
 			return newGameID;
 	},
 
@@ -377,16 +370,15 @@ var GamesView = Backbone.View.extend({
 
 	tools: function(e) {
 		var master = this;
-		var backup = function(input, that){
-			var confirmed = window.confirm('backup ?')
+		var backup = function(input){
+			var confirmed = window.confirm('backup in scorekeeper/backup.txt ?')
 			
 	     	//dialog('what to do?', false, $('.dialog-holder'), $('.export-tool'), ['backup', 'restore'], [backup, restore])
-			console.log('dialogged')
 			if (!confirmed) {
 				return
 			}
-			var a = new DirManager(); // Initialize a Folder manager
-			a.create_r('scorekeeper',Log('created successfully'));
+			//var a = new DirManager(); // Initialize a Folder manager
+			//a.create_r('scorekeeper',Log('created successfully'));
 			//a.list('scorekeeper', function(arr){ 
 				var b = new FileManager();
 				//console.log(arr.length)
@@ -396,27 +388,49 @@ var GamesView = Backbone.View.extend({
 			//});
 			
 		};
-		
-		var restore = function(input, that){
-			var confirmed = window.confirm('restore from backup.txt file ?')
+		var readFile = function(fileName) {
+			var b = new FileManager();
+			b.read_file('scorekeeper',fileName, function(r) {
+				localStorage.setItem('games', r)
+				reload();
+				window.alert('your backup is loaded')
+			})
+		};
+
+		var writeFile = function(fileName) {
+			var b = new FileManager();
+			b.write_file('scorekeeper', fileName, localStorage.getItem('games') , Log('wrote sucessful!'), Log('something went wrong'));	
+			reload();
+			window.alert('your backup is saved')
+		};
+
+		var restore = function(input){
+			var confirmed = window.confirm('restore from scorekeeper/backup.txt file ?')
 			if (!confirmed) {
 				return
 			}
-			var b = new FileManager();
-			b.read_file('scorekeeper','backup.txt', function(r) {
-				console.log(r);
-				localStorage.setItem('games', r)
-				console.log(Games);
-				//master.initialize();
-				window.location.reload();
-				window.alert('your backup is loaded')
-			}
-			,Log('something went wrong'));
-
 			//b.read_file('scorekeeper','backup.txt',function(r){console.log(r)},Log('wrote sucessful!'));
 		};
 
-		dialog('what to do?', false, $('.dialog-holder'), ['backup', 'restore'], [backup, restore])
+		var afterClose = function(action){
+			console.log(action)
+			if (action == 'save'){
+				dialog('Backup name?', true, $('.dialog-holder'), ['ok', 'cancel'], [ function(fileName){
+					writeFile(fileName)}
+				, function(){}], reload)
+			}
+			if (action == 'open'){
+				var a = new DirManager();
+				a.list('scorekeeper', function(arr){
+					dialog('Import Backup', false, $('.dialog-holder'), arr, 
+					_.map(arr, function(u, v){
+						return function(){console.log(u);readFile(u)}
+					}),
+					 reload)
+				})
+			}
+		}
+		dialog('what to do?', false, $('.dialog-holder'), ['open', 'save'], [function(){}, function(){}], afterClose)
 	}
 });
 
@@ -444,11 +458,6 @@ var GameView = Backbone.View.extend({
 	editName: function(e) {
 		var master = this;
 		var oldName = this.model.get('name');
-
-
-
-
-				var master = this;
 		e.preventDefault();
 		var modalLink = $('.modalLink');
 		$('.modalLink').css('display', 'block')
@@ -484,21 +493,8 @@ var GameView = Backbone.View.extend({
 			$('.game-name').val('');
 			$('.btn-ok').off('click')
 			$('.modalLink').css('display', 'none')
-		})
-
-
-
-
-
-		//this.render();
-
-		
+		})	
 	},
-
-	/*showSessions: function() {
-		this.trigger('left');
-		console.log('requested sessions of game of ID:' + this.model.get('id'));
-	},*/
 });
 
 var SessionsView = Backbone.View.extend({
@@ -520,7 +516,6 @@ var SessionsView = Backbone.View.extend({
 	},
 
 	duplicate: function(item){
-		//this.collection.add(new Session({players: new Players({item.players.toJSON()})}));
 		var session = item.toJSON();
 		playersCollection = new Players(_.map(session.players.toJSON(), function(player, idp){
 				player.score = [];
@@ -585,17 +580,9 @@ var SessionsView = Backbone.View.extend({
 		var newSessionID = Number(new Date);
 		this.collection.add(new Session({id: newSessionID, players: new Players(new Player({id: Number(new Date)}))}));
 		this.trigger('change');
-		//this.render(this.gameID);
-		//console.log(this.collection)
 		appScore.app.activeViews.push(new SessionView({model: this.collection.get(1438672008536)}))
-		/*
-		var redirect = function() {
-		}*/
-		//var relocate = function() {
-			window.location.href = '#session?' + master.gameID + '?' + newSessionID ;
-			window.reload()
-		//}
-
+		window.location.href = '#session?' + master.gameID + '?' + newSessionID ;
+		window.reload()
 	}
 });
 
@@ -657,10 +644,6 @@ var PlayersView = Backbone.View.extend({
 		if (!sure){
 			return
 		}
-		//this.model.set('finishTime', 0);
-		//this.model.set('startTime', 0);
-		//this.model.set('paused', 0);
-		//this.model.set('pauseTime', 0);
 		var extraPause = this.model.get('pauseTime') + Number(new Date) - this.model.get('finishTime');
 		this.model.set('finishTime', 0);
 		this.model.set('pauseTime', extraPause)
@@ -699,10 +682,6 @@ var PlayersView = Backbone.View.extend({
 	},
 
 	finishSession: function() {
-		/*var finished = window.confirm('Finish Session ?');
-		if (!finished){
-			return
-		}*/
 		this.model.set('finishTime', Number(new Date));
 		if (this.model.get('paused')) {
 			this.model.set('pauseTime', this.model.get('pauseTime') + Number(new Date) - this.model.get('paused'));
@@ -747,7 +726,6 @@ var PlayersView = Backbone.View.extend({
 		var buttonLabel = finishTime ? 'Re-open' : buttonLabel;
 		$('.btn-session-function').html(buttonLabel)
 		var state = this.getState();
-		//(state == 'started') || (state =='finished') ? $('.btn-add-player').css('display','none') :  $('.btn-add-player').css('display','block')
 	},
 
 	sessionFunction: function() {
@@ -799,14 +777,6 @@ var PlayersView = Backbone.View.extend({
 		var master = this;
 		var playersHolder = $('.players', this.$el);
 		playersHolder.empty();
-
-/*		this.model.get('players').each(function(item, id) {
-			var playerView = (new PlayerView({model: item}))
-			playerView.render(id).$el.appendTo(playersHolder);
-			master.listenTo(playerView, 'change', master.changed);
-			master.listenTo(playerView, 'delete', master.removedPlayer);
-			master.listenTo(playerView, 'start', master.startSession);
-		})*/
 		this.trigger('change');
 		this.render();
 	},
@@ -833,7 +803,6 @@ var PlayersView = Backbone.View.extend({
 		_.each(_.pluck(this.model.get('players').toJSON(),'timestamps'), function(item){
 			allLabels = _.union(allLabels, item)
 		})
-
 		var lastTimestamp = allLabels.sort()[allLabels.length - 1]
 		console.log(allLabels)
 		console.log(lastTimestamp)
@@ -847,20 +816,16 @@ var PlayersView = Backbone.View.extend({
 				score.splice(-1,1)
 			}
 		})
-
 		this.trigger('change');
 		this.render();
 	},
 
-	render: function(nextStep) {
+	render: function() {
 		var width = $(window).width();
 		var master = this;
-
 		clearInterval(appScore.app.timer);
 		appScore.app.timer = 0;
-
 		this.listenTo(this.model, 'change', this.changed);
-
 		var master = this;
 		var playersHolder = $('.players', this.$el);
 		playersHolder.empty();
@@ -913,10 +878,10 @@ var PlayersView = Backbone.View.extend({
 			$('.btn-add-player').css('display', 'none');
 		}
 		var buyers = $('#buyers').get(0).getContext('2d');
-		setTimeout(_.bind(master.displayChart, master, width, nextStep),0)
+		setTimeout(_.bind(master.displayChart, master, width),0)
 	},
 
-	displayChart: function(width, nextStep){
+	displayChart: function(width){
 		try {
 			_.each(appScore.app.chart, function(item, id){
 				item.clear()
@@ -924,7 +889,6 @@ var PlayersView = Backbone.View.extend({
 		} catch(err){
 			console.log(err)
 		}
-		//Chart.defaults.global.responsive = false;
 		var master = this;
 		var allLabels = [];
 		_.each(_.pluck(master.model.get('players').toJSON(),'timestamps'), function(item){
@@ -968,7 +932,6 @@ var PlayersView = Backbone.View.extend({
 		buyers.canvas.height = width ;//$(window).width();
 		if (appScore.app.chart){
 			_.each(appScore.app.chart, function(item, id){
-				//console.log('chart cleared number ' + item.id)
 				item.clear();
 				item.destroy();	
 			})
@@ -984,16 +947,9 @@ var PlayersView = Backbone.View.extend({
 
 		this.model.get('players').add((new Player({id: Number(new Date), timestamps:[], score:[]})));
 		this.model.get('players')
-		/*this.model.get('players').each(function(item, id) {
-			var playerView = (new PlayerView({model: item}))
-			playerView.render().$el.appendTo(playersHolder);
-			master.listenTo(playerView, 'change', master.changed);
-			master.listenTo(playerView, 'delete', master.removedPlayer);
-		})*/
 		this.trigger('change');
 		$('.player-name').focus()
 		this.render();
-		//this.render();
 	}
 
 });
@@ -1002,7 +958,6 @@ var PlayerView = Backbone.View.extend({
 
 	template: _.template($('#playerTemplate').text()),
 	events: {
-		'click .player-name': 'deleteName',
 		'change .player-name': 'rename',
 		'click .plus': 'plus',
 		'click .minus': 'minus',
@@ -1036,12 +991,10 @@ var PlayerView = Backbone.View.extend({
 
 	plus: function() {
 		this.incrementScore( 1 );
-		//this.trigger('start');
 	},
 
 	minus: function() {
 		this.incrementScore( -1 );
-		//this.trigger('start');
 	},
 
 	delete: function() {
@@ -1050,10 +1003,6 @@ var PlayerView = Backbone.View.extend({
 			this.model.destroy();
 			this.trigger('delete');
 		}
-	},
-
-	deleteName: function() {
-		//$('.player-name', this.$el).val('');
 	},
 
 	rename: function() {
@@ -1103,13 +1052,10 @@ appScore.app = {
 		this.activeViews.push( view );
 		view.render();
 		$('.app-name').html('ScoreKeeper')
-
 	},
 
 	sessions: function(event, args) {
-
 		this.undelegateAll();
-		
 		this.bindEvents();
 		this.gamesCollection.load();
 		var view = new SessionsView({ collection: (this.gamesCollection.get(args[1])).get('sessions') });
@@ -1118,7 +1064,6 @@ appScore.app = {
 		$('.title').html(this.gamesCollection.get(args[1]).get('name'))
 		$('.btn-back').attr('href','#games')
 		this.gamesCollection.listenTo(view, 'change', this.gamesCollection.sync)
-
 	},
 
 	session: function(event, args) {
@@ -1126,13 +1071,11 @@ appScore.app = {
 		this.bindEvents();
 		this.gamesCollection.load();
 		var view = new PlayersView({ model: (this.gamesCollection.get(args[1])).get('sessions').get(args[2]) });
-		this.activeViews.push( view );
 		view.render(args[2]);
 		this.gamesCollection.listenTo(view, 'change', this.gamesCollection.sync)
-
-		//Unelegant changes to the header
+		//Unelegant changes to the button's link
 		$('.btn-back').attr('href','#sessions?' + args[1])
-
+		this.activeViews.push( view );
 	},
 
 	bindEvents: function() {
