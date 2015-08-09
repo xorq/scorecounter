@@ -917,9 +917,9 @@ var PlayersView = Backbone.View.extend({
 
 			return {
 				fillColor : "rgba(0,194,132,0.2)",
-				strokeColor : LISTOFCOLORS[index],
-				pointColor : LISTOFCOLORS[index],//"#fff",
-				pointStrokeColor : LISTOFCOLORS[index],
+				strokeColor : LISTOFCOLORS[index%LISTOFCOLORS.length],
+				pointColor : LISTOFCOLORS[index%LISTOFCOLORS.length],//"#fff",
+				pointStrokeColor : LISTOFCOLORS[index%LISTOFCOLORS.length],
 				data : result
 			}
 		})
@@ -973,7 +973,7 @@ var PlayerView = Backbone.View.extend({
 
 	render: function(number) {
 		var data = this.model.toJSON();
-		data.color = LISTOFCOLORS[number]
+		data.color = LISTOFCOLORS[number%LISTOFCOLORS.length]
 		this.$el.html(this.template(data));
 		return this;
 	},
