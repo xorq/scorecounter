@@ -1,3 +1,7 @@
+var Log = function(t){
+	console.log(t)
+}
+
 var LISTOFCOLORS = ['white', 'red', 'pink', 'orange', 'green', 'yellow', 'blue'];
 var reload = function(){window.location.reload();}
 /*var StopWatch = function() {
@@ -47,11 +51,6 @@ var dialog = function(title, input, holder, buttons, callbacks, afterClose){
 	$('.inputBox').focus();
 };
 
-
-
-
-
-
 function formatDate(d) { 
   var d = parseInt(d)
   var d = new Date(d);
@@ -81,11 +80,20 @@ function getDuration(s) {
 
 	function returnResult(years, days, hours, minutes) {
 		var times = ['y', 'd', 'h', 'm', 's']
+		
+		/*
 		var result = '';
 		_.each(arguments, function(a , b){
 			result += a ? a + times[b] + ' ' : '';
-		})
+		});
 		return result
+		*/
+
+		
+		return _.map(arguments, function(a, b){
+			return a ? a + times[b] : ''
+		}).join(' ');
+
 	}
 	return returnResult(years, days, hours, minutes) + seconds + 's'
 };
@@ -124,12 +132,35 @@ var Player = Backbone.Model.extend({
 		id: Number(new Date),
 		name: '',
 		score: [0],
-		timestamps: [Number(new Date)]
+		timestamps:[Number(new Date)]
 	},
 
 	sync: function() {
 		this.trigger('change');
 	},
+
+	incrementScore: function(increment) {
+		console.log(this.get('score'))
+		console.log(this.get('timestamps'))
+		console.log(increment)
+		console.log((Number(new Date) - (this.get('timestamps'))[this.get('timestamps').length - 1]) )
+		var lastTimestamp = this.get('timestamps')[this.get('timestamps').length - 1];
+		var timestamps = this.get('timestamps');
+		
+
+		if ((Number(new Date) - lastTimestamp) < 2000) {
+			this.get('score')[this.get('score').length - 1] += increment;
+			timestamps[timestamps.length - 1] = Number(new Date);
+			this.set('timesamps', timestamps)
+		} else {
+			var ts = this.get('timestamps');
+			var sc = this.get('score');
+			ts.push(Number(new Date));
+			sc.push(increment);
+			this.set('score', sc);
+			this.set('timestamps', ts);
+		}
+	}
 });
 
 var Players = Backbone.Collection.extend({
@@ -211,7 +242,6 @@ var Games = Backbone.Collection.extend({
 			return (new Game({name:item.name, sessions:sessionsCollection, id: item.id}))
 		}));
 	},
-
 	sync: function() {
 		localStorage.setItem('games', JSON.stringify(this));
 	}
@@ -337,11 +367,9 @@ var GamesView = Backbone.View.extend({
 		if (!gameName) {
 			var gameName = window.prompt('Name?');
 		}
-
 		if (!gameName) {
 			return
 		}
-
 		var alreadyExists = _.filter(this.collection.models, function(item) { return item.attributes.name == gameName }).length > 0;
 		if (alreadyExists) {
 			window.alert('This game already exists')
@@ -379,13 +407,13 @@ var GamesView = Backbone.View.extend({
 			}
 			//var a = new DirManager(); // Initialize a Folder manager
 			//a.create_r('scorekeeper',Log('created successfully'));
-			//a.list('scorekeeper', function(arr){ 
-				var b = new FileManager();
-				//console.log(arr.length)
-				//b.write_file('scorekeeper', 'backup' + arr.length + '.txt', localStorage.getItem('games') ,Log('wrote sucessful!'));
-				b.write_file('scorekeeper', 'backup.txt', localStorage.getItem('games') ,Log('wrote sucessful!'));
-				window.alert('backup saved in scorekeeper folder')
-			//});
+		//a.list('scorekeeper', function(arr){ 
+			var b = new FileManager();
+			//console.log(arr.length)
+			//b.write_file('scorekeeper', 'backup' + arr.length + '.txt', localStorage.getItem('games') ,Log('wrote sucessful!'));
+			b.write_file('scorekeeper', 'backup.txt', localStorage.getItem('games') ,Log('wrote sucessful!'));
+			window.alert('backup saved in scorekeeper folder')
+		//});
 			
 		};
 		var readFile = function(fileName) {
@@ -715,7 +743,7 @@ var PlayersView = Backbone.View.extend({
 			clearInterval(appScore.app.timer);
 			appScore.app.timer = setInterval(function(){
 				displayTimer();
-			},1000)
+			},300)
 		}
 	},
 
@@ -937,6 +965,8 @@ var PlayersView = Backbone.View.extend({
 			})
 			appScore.app.chart = [];
 		}
+		console.log(buyerData);
+
     	appScore.app.chart.push(new Chart(buyers).Line(buyerData, {responsive: false, bezierCurve: false, animation: false, showTooltips: false}));
 	},
 
@@ -979,12 +1009,16 @@ var PlayerView = Backbone.View.extend({
 	},
 
 	incrementScore: function(increment) {
-		var currentScore = this.model.get('score');
+		/*var currentScore = this.model.get('score');
 		currentScore.push(increment);
 		this.model.set('score', currentScore);
 		var currentTimestamps = this.model.get('timestamps');
 		currentTimestamps.push(Number(new Date))
 		this.model.set('timestamps', currentTimestamps);
+		($('.score', this.$el)).text(_.reduce(currentScore, function(memo, num){ return memo + num; }, 0));
+		*/
+		var currentScore = this.model.get('score');
+		this.model.incrementScore(increment);
 		($('.score', this.$el)).text(_.reduce(currentScore, function(memo, num){ return memo + num; }, 0));
 		this.trigger('change');
 	},
@@ -1089,7 +1123,7 @@ appScore.app = {
 	onDeviceReady: function() {
 		/*$(".myMenu ul li a").on("touchend", function(event) {
   window.location.href = $(this).attr("href");
-});*/
+
 		
 		//FastClick.attach(document.body);
 		appScore.app.receivedEvent('deviceready');
