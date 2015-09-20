@@ -1,15 +1,18 @@
-var Log = function(t){
-	console.log(t)
-}
+if (!Array.prototype.last){
+	Array.prototype.last = function(){
+		return this[this.length - 1];
+	};
+};
 
 var LISTOFCOLORS = ['white', 'red', 'pink', 'orange', 'green', 'yellow', 'blue'];
 var reload = function(){window.location.reload();}
-/*var StopWatch = function() {
+var StopWatch = function() {
 	var start = (new Date()).getTime();
 	this.elapsed = function() {
 		return (new Date()).getTime() - start;
 	}
-}*/
+}
+
 var dialog = function(title, input, holder, buttons, callbacks, afterClose){
 	var action = '';
 	holder.html('')
@@ -26,9 +29,10 @@ var dialog = function(title, input, holder, buttons, callbacks, afterClose){
 			<div data-inline='true'>\
 				" + buttonsHTML + 
 			"</div>")
-	holder.css('display','block');
 	var pop = holder.popup();
 	pop.popup('open', {positionTo: '#popup-position'});
+	holder.css('display','block');
+
 	holder.one({
 		popupafterclose: function(event, ui) { 
 			try{holder.popup('destroy'); } catch(err){}
@@ -140,10 +144,6 @@ var Player = Backbone.Model.extend({
 	},
 
 	incrementScore: function(increment) {
-		console.log(this.get('score'))
-		console.log(this.get('timestamps'))
-		console.log(increment)
-		console.log((Number(new Date) - (this.get('timestamps'))[this.get('timestamps').length - 1]) )
 		var lastTimestamp = this.get('timestamps')[this.get('timestamps').length - 1];
 		var timestamps = this.get('timestamps');
 		
@@ -298,7 +298,6 @@ var GamesView = Backbone.View.extend({
 	},
 
 	initialize: function() {
-		console.log('init')
 		this.collection.load()
 		if (!this.collection.length) {
 			this.collection.add(new Game()) 
@@ -382,7 +381,6 @@ var GamesView = Backbone.View.extend({
 
 	sortNames: function(){
 		var master = this;
-		console.log(this.collection.toJSON())
 		var retri = this.collection.toJSON().sort(function(a, b){
 		var nameA = a.name.toLowerCase(), nameB=b.name.toLowerCase()
 		if (nameA < nameB) {//sort string ascending
@@ -548,7 +546,7 @@ var SessionsView = Backbone.View.extend({
 		playersCollection = new Players(_.map(session.players.toJSON(), function(player, idp){
 				player.score = [];
 				player.timestamps = [];
-				return new Player({id: player.id, score: [0], timestamps: [session.id], name:player.name})
+				return new Player({id: player.id, score: [0], timestamps: [Number(new Date)], name:player.name})
 			}));
 		var laSession = new Session({pauseTime: 0, paused: 0, startTime:0, finishTime:0, id: Number(new Date), players:playersCollection})
 		this.collection.add(laSession);
@@ -965,7 +963,6 @@ var PlayersView = Backbone.View.extend({
 			})
 			appScore.app.chart = [];
 		}
-		console.log(buyerData);
 
     	appScore.app.chart.push(new Chart(buyers).Line(buyerData, {responsive: false, bezierCurve: false, animation: false, showTooltips: false}));
 	},
@@ -1077,7 +1074,8 @@ appScore.app = {
 	},
 
 	games: function(event, args) {
-		console.log(appScore.app.activeViews)
+		//document.addEventListener('deviceready',function(){
+
 		this.undelegateAll();
 		this.bindEvents();
 
@@ -1146,4 +1144,3 @@ appScore.router = new $.mobile.Router(
 	},
 	appScore.app
 );
-
