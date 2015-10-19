@@ -151,7 +151,7 @@ var Player = Backbone.Model.extend({
 		if ((Number(new Date) - lastTimestamp) < 2000) {
 			this.get('score')[this.get('score').length - 1] += increment;
 			timestamps[timestamps.length - 1] = Number(new Date);
-			this.set('timesamps', timestamps)
+			this.set('timestamps', timestamps)
 		} else {
 			var ts = this.get('timestamps');
 			var sc = this.get('score');
@@ -182,6 +182,7 @@ var Session = Backbone.Model.extend({
 		finishTime: 0,
 		pauseTime: 0,
 		paused: 0,
+		statMode: false
 	},
 
 	sync: function() {
@@ -237,7 +238,7 @@ var Games = Backbone.Collection.extend({
 					}
 					return new Player(player)
 				}));
-				return new Session({pauseTime: session.pauseTime, paused: session.paused, startTime:session.startTime, finishTime:session.finishTime, id: session.id, players:playersCollection})
+				return new Session({statMode: session.statMode, pauseTime: session.pauseTime, paused: session.paused, startTime:session.startTime, finishTime:session.finishTime, id: session.id, players:playersCollection})
 			}));
 			return (new Game({name:item.name, sessions:sessionsCollection, id: item.id}))
 		}));
@@ -660,7 +661,16 @@ var PlayersView = Backbone.View.extend({
 		'click .btn-reset-scores': 'resetScores',
 		'click .btn-delete-last-record': 'deleteLastRecord',
 		'click .session-title': 'pauseButton',
-		'click .btn-session-function': 'sessionFunction'
+		'click .btn-session-function': 'sessionFunction', 
+		'click .btn-stat-mode': 'changeStatMode'
+	},
+
+	changeStatMode: function() {
+		var newStatMode = !this.model.get('statMode');
+		console.log(newStatMode)
+		this.model.set('statMode', newStatMode);
+		console.log(this.model.get('statMode'));
+		this.render();
 	},
 
 	template: _.template($('#playersTemplate').text()),
@@ -798,6 +808,7 @@ var PlayersView = Backbone.View.extend({
 		this.trigger('change');
 		var master = this;
 		setTimeout(function() {master.displayChart()}, 0);
+		this.render();
 	},
 	removedPlayer: function() {
 		var master = this;
@@ -830,11 +841,8 @@ var PlayersView = Backbone.View.extend({
 			allLabels = _.union(allLabels, item)
 		})
 		var lastTimestamp = allLabels.sort()[allLabels.length - 1]
-		console.log(allLabels)
-		console.log(lastTimestamp)
 		//delete the record for that Last timestamp
 		this.model.get('players').each(function(item, idx) {
-			console.log(item)
 			var timestamps = item.get('timestamps');
 			var score = item.get('score');
 			if (timestamps[timestamps.length - 1] == lastTimestamp) {
@@ -856,6 +864,11 @@ var PlayersView = Backbone.View.extend({
 		var playersHolder = $('.players', this.$el);
 		playersHolder.empty();
 		this.model.get('players').each(function(item, id) {
+			if (master.model.get('statMode')) {
+				item.set('statMode', true);
+			} else {
+				item.set('statMode', false)
+			}
 			var playerView = (new PlayerView({model: item}))
 			playerView.render(id).$el.appendTo(playersHolder);
 			master.listenTo(playerView, 'change', master.changed);
@@ -903,6 +916,10 @@ var PlayersView = Backbone.View.extend({
 			$('.player-name').addClass('ui-disabled').css('opacity','100');;
 			$('.btn-add-player').css('display', 'none');
 		}
+
+		// render the stat mode button
+		$('.btn-stat-mode').html(this.model.get('statMode') ? '- stat mode - (activated)' : '- stat mode -');
+
 		var buyers = $('#buyers').get(0).getContext('2d');
 		setTimeout(_.bind(master.displayChart, master, width),0)
 	},
@@ -1016,7 +1033,7 @@ var PlayerView = Backbone.View.extend({
 		*/
 		var currentScore = this.model.get('score');
 		this.model.incrementScore(increment);
-		($('.score', this.$el)).text(_.reduce(currentScore, function(memo, num){ return memo + num; }, 0));
+		//($('.score', this.$el)).text(_.reduce(currentScore, function(memo, num){ return memo + num; }, 0));
 		this.trigger('change');
 	},
 
@@ -1140,7 +1157,8 @@ appScore.router = new $.mobile.Router(
 	{
 		"#games": { handler: "games", events: "bs"},	
 		"#sessions[?](\\d+)": { handler: "sessions", events: "bs"},
-		"#session[?](\\d+)[?](\\d+)": { handler: "session", events: "bs"},			
+		"#session[?](\\d+)[?](\\d+)": { handler: "session", events: "bs"},
+
 	},
 	appScore.app
 );
