@@ -96,7 +96,6 @@
 				<!--<a data-role='button' class='btn-reset-scores ui-btn' style='color:red'>- Reset Scores -</a>-->
 				<canvas id="buyers" width="600" height="400"></canvas>
 				<a data-role='button' class='btn-delete-last-record ui-btn' style='color:orange'>- Delete Last Entry-</a>
-				<a data-role='button' class='btn-stat-mode ui-btn' style='color:lightblue'>- Stat mode -</a>
 			</div>
 		</div>
 
@@ -136,22 +135,18 @@
 							<a href='#session?<%=gameID%>?<%=id%>' data-role='button' data-transition='slide' class='btn-game-name ui-btn ui-icon-carat-r ui-btn-icon-right' style='background-color:<%=timer ? "green" : "default"%>'><%=timestamp%></a>
 						</li>
 					</ul>
-				</script><!--<%=typeof statMode !== 'undefined' ? (statMode ? 'cacaboutchou' : 'proute') : 'voiula'%>-->
-				<script type='text/template' id='playerTemplate'>
+				</script>
 
+				<script type='text/template' id='playerTemplate'>
 					<div class="ui-grid-a" style='height:50px'>
 						<div class='ui-block-b' style='width:33%;height: 100%;'>
 							<input type="text" class='player-name' style="color:<%=color%>;background:black" value='<%=name%>'></input>
 						</div>
 						<div class="ui-block-c score-player" style='font-size:100%;color:<%=color%>;text-align:center;height: 100%;width:18%'>
-							<text class='score' style=''><%=statMode ? 
-							Math.round(100 * _.reduce(score, function(memo, n){ return memo + (n > 0 ? n : 0)}, 0) / 
-							_.reduce(score, function(memo, n){ return memo + (n != 0 ? Math.abs(n) : 0)}, 0)) + '%' : 
-
-							_.reduce(score, function(memo, num){ return memo + num; }, 0)%></text>
+							<text class='score' style=''><%=_.reduce(score, function(memo, num){ return memo + num; }, 0)%></text>
 						</div>
 						<div class="ui-block-d" style='width:17%;height:100%'>
-							<a style='height:100%;width:100%;margin:0px;padding:0px' class='plus ui-btn ui-btn-icon-notext ui-icon-plus' style='backboneground-color:green'></a>
+							<a style='height:100%;width:100%;margin:0px;padding:0px' class='plus ui-btn ui-btn-icon-notext ui-icon-plus' style='background-color:green'></a>
 							</div>
 						<div class="ui-block-e" style='width:17%;height:100%'>
 							<a style='height:100%;width:100%;margin:0px;padding:0px' class='minus ui-btn ui-btn-icon-notext ui-icon-minus'></a>
